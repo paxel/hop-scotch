@@ -22,7 +22,7 @@ Everything else is up to the user to implement.
 The benefit is of course: If you add a stage in the middle or you remove a stage, or you replace a stage, you just have to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
 
 # An example
-
+ 
 We have 3 stages.
 The Data are sentences.
 
@@ -30,31 +30,31 @@ The Data are sentences.
 
 **Hop 1 - Language detector**
 
-Predicate: all
+Predicate: all<br/>
 Enriches the sentence with the "language" of the text (e.g. french)
 
 **Stage 2**
 
 **Hop 1 - French translator**
 
-Predicate: language: french
+Predicate: language: french<br/>
 Enriches the sentence with an english translation of the french original
 
 **Hop 2 - German translator**
 
-Predicate: language: german
+Predicate: language: german<br/>
 Enriches the sentence with an english translation of the german original
 
 **Stage 3**
 
 **Hop 1 - PDF Builder (original)**
 
-Predicate: all
+Predicate: all<br/>
 Aggregate all original sentences into a PDF
 
 **Hop 2 - PDF Builder (translated)**
 
-Predicate: translation exists
+Predicate: translation exists<br/>
 Aggregate all translated sentences into a PDF
 
 In this example, if you add more Hops in stage 2, you automatically support more languages (if the detector can detect them)
@@ -66,7 +66,7 @@ To create this hop-scotch, you can implement Two types of Hops:
 
 ## Processor
 
-The Processor is given to the hopscotch as an instance if an implementation of `ProcessorHopFactory<D,M>`.
+The Processor is given to the hopscotch as an instance if an implementation of `ProcessorHopFactory<D,M>`.<br/>
 Which provides 3 methods:
 
 ```java
@@ -77,7 +77,7 @@ Predictor<M,D> createPredictor();
 
 ## Gates
 
-A Gate is a Special Processor that tells the next stage to drop this data.
+A Gate is a Special Processor that tells the next stage to drop this data.<br/>
 If there are multiple gates on a stage, the next stage will drop the data if any one of them demands the drop.
 
 ```java
