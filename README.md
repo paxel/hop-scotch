@@ -10,7 +10,9 @@ Define your processing stages with as little effort as possible:
 * A Predicate / Factory to check if the code should be run with the data
 * The Actual code to process the data
 
-The hop scotch framework will take these and build a chain of actors with the lintstone actor framework and provide you with:
+The hop scotch framework will take these and build a chain of actors with the lintstone actor framework and provide you
+with:
+
 * A method to feed the data in
 * An interface to check the process
 
@@ -18,11 +20,11 @@ Everything else is up to the user to implement.
 
 ![](https://upload.wikimedia.org/wikipedia/commons/4/49/Amarelinhacefet.jpg)
 
-
-The benefit is of course: If you add a stage in the middle or you remove a stage, or you replace a stage, you just have to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
+The benefit is of course: If you add a stage in the middle or you remove a stage, or you replace a stage, you just have
+to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
 
 # An example
- 
+
 We have 3 stages.
 The Data are sentences.
 
@@ -57,8 +59,10 @@ Aggregate all original sentences into a PDF
 Predicate: translation exists<br/>
 Aggregate all translated sentences into a PDF
 
-In this example, if you add more Hops in stage 2, you automatically support more languages (if the detector can detect them)
-And if you replace the PDF builders with just a french one, you will only have the french PDF. Additionally if you insert a translator from english to french between stage 2 and 3 you will have all texts in french as PDF.
+In this example, if you add more Hops in stage 2, you automatically support more languages (if the detector can detect
+them)
+And if you replace the PDF builders with just a french one, you will only have the french PDF. Additionally if you
+insert a translator from english to french between stage 2 and 3 you will have all texts in french as PDF.
 
 # Types of Hops
 
@@ -71,8 +75,10 @@ Which provides 3 methods:
 
 ```java
 int getStage();
-Processor<D> create(M meta);
-Predictor<M,D> createPredictor();
+
+Hop<D> create(M meta);
+
+Judge<M, D> createJudge();
 ```
 
 ## Gates
@@ -82,7 +88,7 @@ If there are multiple gates on a stage, the next stage will drop the data if any
 
 ```java
 int getStage();
-Processor<D> create();
 
+Gate<D> create();
 ```
 
