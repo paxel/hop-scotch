@@ -1,6 +1,7 @@
 package paxel.hopscotch.api;
 
 import java.time.Duration;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The Interface of the Pipeline for the user.
@@ -21,7 +22,7 @@ public interface HopScotchSystem<D> {
      *
      * @return The Statistics of the pipeline at the time.
      */
-    Statistics getStatistics();
+    Statistics getStatistics() throws ExecutionException, InterruptedException;
 
     /**
      * Awaits the processing of all added data.

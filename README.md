@@ -20,7 +20,7 @@ Everything else is up to the user to implement.
 
 ![](https://upload.wikimedia.org/wikipedia/commons/4/49/Amarelinhacefet.jpg)
 
-The benefit is of course: If you add a stage in the middle or you remove a stage, or you replace a stage, you just have
+The benefit is of course: If you add a stage in the middle, or you remove a stage, or you replace a stage, you just have
 to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
 
 # An example
@@ -33,14 +33,14 @@ The Data are sentences.
 **Hop 1 - Language detector**
 
 Predicate: all<br/>
-Enriches the sentence with the "language" of the text (e.g. french)
+Enriches the sentence with the "language" of the text (e.g. French)
 
 **Stage 2**
 
 **Hop 1 - French translator**
 
-Predicate: language: french<br/>
-Enriches the sentence with an english translation of the french original
+Predicate: language: French<br/>
+Enriches the sentence with an english translation of the French original
 
 **Hop 2 - German translator**
 
@@ -61,8 +61,8 @@ Aggregate all translated sentences into a PDF
 
 In this example, if you add more Hops in stage 2, you automatically support more languages (if the detector can detect
 them)
-And if you replace the PDF builders with just a french one, you will only have the french PDF. Additionally if you
-insert a translator from english to french between stage 2 and 3 you will have all texts in french as PDF.
+And if you replace the PDF builders with just a French one, you will only have the French PDF. Additionally, if you
+insert a translator from english to French between stage 2 and 3 you will have all texts in French as PDF.
 
 # Types of Hops
 
@@ -76,7 +76,7 @@ Which provides 3 methods:
 ```java
 int getStage();
 
-Hop<D> create(M meta);
+Hop<D> createHop(M meta);
 
 Judge<M, D> createJudge();
 ```
@@ -89,6 +89,6 @@ If there are multiple gates on a stage, the next stage will drop the data if any
 ```java
 int getStage();
 
-Gate<D> create();
+Gate<D> createGate();
 ```
 

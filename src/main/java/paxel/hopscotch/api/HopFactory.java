@@ -1,6 +1,6 @@
 package paxel.hopscotch.api;
 
-public interface HopFactory<M, D> {
+public interface HopFactory<D> {
     /**
      * Rerieve the stage number (must be >= 0)
      *
@@ -14,11 +14,11 @@ public interface HopFactory<M, D> {
      * @param m the Meta Data to create the Hop
      * @return The new hop
      */
-    Hop<D> createHop(M m);
+    Hop<D> createHop(Object m);
 
     /**
      * Create a Judge to judge the data
      * @return
      */
-    Judge<M, D> createJudge();
+    Judge<D> createJudge();
 }
