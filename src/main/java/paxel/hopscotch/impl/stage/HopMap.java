@@ -11,8 +11,8 @@ public class HopMap<D> {
 
     private final Map<Integer, Map<HopId, LintStoneActorAccessor>> actorMap = new HashMap<>();
 
-    public LintStoneActorAccessor computeIfAbsent(int judgeNumber, HopId id, Supplier<LintStoneActorAccessor> o) {
+    public LintStoneActorAccessor computeIfAbsent(int judgeNumber, HopId id, Supplier<LintStoneActorAccessor> supplier) {
         return actorMap.computeIfAbsent(judgeNumber, j -> new HashMap<>())
-                .computeIfAbsent(id, h -> o.get());
+                .computeIfAbsent(id, h -> supplier.get());
     }
 }

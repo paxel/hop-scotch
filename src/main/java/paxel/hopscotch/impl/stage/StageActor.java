@@ -17,9 +17,10 @@ public class StageActor<D> implements LintStoneActor {
     private final Config config;
 
     private List<Judge<D>> judges = new ArrayList<>();
-    private Gates<D> bill = new Gates<>();
+    private List<GateFactory<D>> gateFactories = new ArrayList<>();
     private String nextStageName;
     private HopMap<D> hopMap = new HopMap<>();
+    private GateMap<D> gateMap = new GateMap<>();
 
     public StageActor(Integer stage, List<Object> factories, Config config) {
         this.stage = stage;
@@ -30,10 +31,13 @@ public class StageActor<D> implements LintStoneActor {
                     judges.add(((JudgeFactory<D>) hf).createJudge());
                 }
                 case GateFactory<?> gf -> {
-                    bill.add((GateFactory<D>) gf);
+                    gateFactories.add(((GateFactory<D>) gf));
+                }
+                case null -> {
+                    throw new IllegalArgumentException("Factory must not be null");
                 }
                 default -> {
-                    // TODO: error handler
+                    throw new IllegalArgumentException("Unknown factory type: " + factory.getClass());
                 }
             }
         }
@@ -64,29 +68,50 @@ public class StageActor<D> implements LintStoneActor {
     }
 
     private int distributeData(LintStoneMessageEventContext mec, HopScotchData<D> aggregation) {
-        int i = 0;
         int sent = 0;
-        for (Judge<D> judge : judges) {
-            i++;
-            Judgment<D> judgement = judge.judge(aggregation);
-            if (judgement.isAccepted()) {
-                LintStoneActorAccessor actor = getLintStoneActorAccessor(mec, i, judgement.getId(), judgement);
+        {
+            int hopNumber = 0;
+            for (Judge<D> judge : judges) {
+                hopNumber++;
+                Judgment<D> judgement = judge.judge(aggregation);
+                if (judgement.isAccepted()) {
+                    LintStoneActorAccessor actor = getHopActor(mec, hopNumber, judgement.getId(), judgement);
+                    // forward message to hop
+                    actor.tell(aggregation);
+                    sent++;
+                }
+            }
+        }
+        {
+            int gateNumber = 0;
+            for (GateFactory<D> gate : gateFactories) {
+                gateNumber++;
+                LintStoneActorAccessor actor = getGateActor(mec, gateNumber, gate);
                 // forward message to hop
                 actor.tell(aggregation);
                 sent++;
             }
         }
+
         return sent;
     }
 
-    private LintStoneActorAccessor getLintStoneActorAccessor(LintStoneMessageEventContext mec, int judgeNumber, HopId id, Judgment<D> judgement) {
-        LintStoneActorAccessor actor = hopMap.computeIfAbsent(judgeNumber, id, () -> {
-            Hop<D> hop = judgement.createHop();
-            String name = "Hop." + stage + "." + judgeNumber + "." + hop.getClass().getSimpleName() + "." + id.id();
-            mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1, mec.getName(), "hop", "created"));
-            return mec.registerActor(name, () -> new HopActor(hop), ActorSettings.DEFAULT);
+    private LintStoneActorAccessor getGateActor(LintStoneMessageEventContext mec, int gateNumber, GateFactory<D> gateFactory) {
+        return gateMap.computeIfAbsent(gateNumber, () -> {
+            Gate<D> gate = gateFactory.createGate();
+            String name = "Gate." + stage + "." + gateNumber + "." + gate.getClass().getSimpleName();
+            mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1, mec.getName(), "gate", "created"));
+            return mec.registerActor(name, () -> new GateActor(gate, nextStageName, config), ActorSettings.DEFAULT);
         });
-        return actor;
+    }
+
+    private LintStoneActorAccessor getHopActor(LintStoneMessageEventContext mec, int hopNumber, HopId id, Judgment<D> judgement) {
+        return hopMap.computeIfAbsent(hopNumber, id, () -> {
+            Hop<D> hop = judgement.createHop();
+            String name = "Hop." + stage + "." + hopNumber + "." + hop.getClass().getSimpleName() + "." + id.id();
+            mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1, mec.getName(), "hop", "created"));
+            return mec.registerActor(name, () -> new HopActor(hop, nextStageName, config), ActorSettings.DEFAULT);
+        });
     }
 
     private HopScotchData<D> aggregate(HopScotchData<D> fragment) {
