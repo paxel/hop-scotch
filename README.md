@@ -18,8 +18,6 @@ with:
 
 Everything else is up to the user to implement.
 
-![](https://upload.wikimedia.org/wikipedia/commons/4/49/Amarelinhacefet.jpg)
-
 The benefit is of course: If you add a stage in the middle, or you remove a stage, or you replace a stage, you just have
 to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
 
