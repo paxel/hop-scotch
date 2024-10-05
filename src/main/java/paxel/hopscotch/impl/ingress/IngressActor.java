@@ -2,6 +2,7 @@ package paxel.hopscotch.impl.ingress;
 
 import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
@@ -18,27 +19,24 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
  * @param <D> The type of the data
  */
 public class IngressActor<D> implements LintStoneActor {
-    private final Config config;
     private StatisticsActor.Increment incMessage;
     private String firstStage;
-    private BiConsumer<LintStoneMessageEventContext, HopScotchData<D>> forwarder = (m, d) -> m.getActor(firstStage).tell(d);
+    private BiConsumer<LintStoneMessageEventContext, Object> forwarder = (m, d) -> m.getActor(firstStage).tell(d);
 
     public IngressActor(Config config) {
-        this.config = config;
         int backPressure = config.backPressure();
         if (backPressure > 0) {
+            // replacing the forwarder with backpressure variant if needed.
             forwarder = (m, d) -> {
                 try {
                     m.getActor(firstStage)
                             .tellWithBackPressure(d, backPressure);
                 } catch (InterruptedException e) {
-                    // TODO: more graceful handling
+                    Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
                 }
             };
         }
-
-
     }
 
     @Override
@@ -51,7 +49,7 @@ public class IngressActor<D> implements LintStoneActor {
     private void processData(HopScotchData hopScotchData, LintStoneMessageEventContext mec) {
         ensureMessage(mec);
         mec.getActor(STATISTICS).tell(incMessage);
-        forwarder.accept(mec, hopScotchData);
+        forwarder.accept(mec, new StageActor.Single<>(hopScotchData));
     }
 
     private void ensureMessage(LintStoneMessageEventContext mec) {

@@ -11,12 +11,12 @@ class HopMapTest {
 
     @Test
     void testCreate() {
-        assertThat(new HopMap<>().computeIfAbsent(1, mock(), () -> mock())).isNotNull();
+        assertThat(new HopMap().computeIfAbsent(1, mock(), () -> mock())).isNotNull();
     }
 
     @Test
     void testRecreate() {
-        HopMap<String> hopMap = new HopMap<>();
+        HopMap hopMap = new HopMap();
         HopId mockId = mock();
         LintStoneActorAccessor mock = mock();
         hopMap.computeIfAbsent(1, mockId, () -> mock);

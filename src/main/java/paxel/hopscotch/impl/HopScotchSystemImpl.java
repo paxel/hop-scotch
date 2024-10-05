@@ -48,7 +48,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         // Collects statistics from all Actors and provides them on demand
         lintStoneSystem.registerActor(STATISTICS, () -> new StatisticsActor(config), ActorSettings.DEFAULT);
         // Responsible to add all finished Data to the Consumer
-        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer, config), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer), ActorSettings.DEFAULT);
 
         lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(config), ActorSettings.DEFAULT);
 
@@ -65,7 +65,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         }
 
         lintStoneSystem.getActor(previousName).tell(TERMINATOR);
-        lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor(config), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor(), ActorSettings.DEFAULT);
 
     }
 

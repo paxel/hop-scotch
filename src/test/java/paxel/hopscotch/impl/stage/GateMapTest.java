@@ -10,12 +10,12 @@ class GateMapTest {
 
     @Test
     void testCreate() {
-        assertThat(new GateMap<>().computeIfAbsent(1, () -> mock())).isNotNull();
+        assertThat(new GateMap().computeIfAbsent(1, () -> mock())).isNotNull();
     }
 
     @Test
     void testRecreate() {
-        GateMap<String> gateMap = new GateMap<>();
+        GateMap gateMap = new GateMap();
         LintStoneActorAccessor mock = mock();
         gateMap.computeIfAbsent(1, () -> mock);
 

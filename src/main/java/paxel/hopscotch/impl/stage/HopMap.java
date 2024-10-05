@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class HopMap<D> {
+public class HopMap {
 
     private final Map<Integer, Map<HopId, LintStoneActorAccessor>> actorMap = new HashMap<>();
 

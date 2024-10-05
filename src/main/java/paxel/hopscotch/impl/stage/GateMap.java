@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class GateMap<D> {
+public class GateMap {
 
     private final Map<Integer, LintStoneActorAccessor> actorMap = new HashMap<>();
 

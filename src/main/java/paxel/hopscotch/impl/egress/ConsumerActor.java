@@ -1,6 +1,5 @@
 package paxel.hopscotch.impl.egress;
 
-import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -15,12 +14,10 @@ public class ConsumerActor<D> implements LintStoneActor {
     public static final String CONSUMER = "Consumer";
 
     private final Consumer<HopScotchData<D>> consumer;
-    private final Config config;
     private StatisticsActor.Increment incMessage;
 
-    public ConsumerActor(Consumer<HopScotchData<D>> consumer, Config config) {
+    public ConsumerActor(Consumer<HopScotchData<D>> consumer) {
         this.consumer = consumer;
-        this.config = config;
     }
 
     @Override
@@ -34,7 +31,7 @@ public class ConsumerActor<D> implements LintStoneActor {
 
 
     private void ensureMessage(LintStoneMessageEventContext mec) {
-        // only create it once, to reduce garbage
+        // only create it once, to reduce gc
         if (incMessage == null)
             incMessage = new StatisticsActor.Increment(1L, mec.getName(), PROCESSED);
     }

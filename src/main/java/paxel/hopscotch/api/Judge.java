@@ -7,7 +7,7 @@ package paxel.hopscotch.api;
  */
 public interface Judge<D> {
     /**
-     * The Judgment provides the result of the decision of the Judge.
+     * The Judgment provides the result of the Judges decision.
      *
      * @param data The data to be judged
      * @return the Judgment

@@ -1,6 +1,5 @@
 package paxel.hopscotch.impl.egress;
 
-import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -11,11 +10,9 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.PROCESSED;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
 public class TerminatorActor implements LintStoneActor {
-    private final Config config;
     private StatisticsActor.Increment incMessage;
 
-    public TerminatorActor(Config config) {
-        this.config = config;
+    public TerminatorActor() {
     }
 
     @Override
