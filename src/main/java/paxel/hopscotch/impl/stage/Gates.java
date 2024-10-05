@@ -1,4 +1,4 @@
-package paxel.hopscotch.impl;
+package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.GateFactory;
 

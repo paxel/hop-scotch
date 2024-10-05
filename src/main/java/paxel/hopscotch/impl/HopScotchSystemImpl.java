@@ -4,6 +4,11 @@ import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.HopScotchSystem;
 import paxel.hopscotch.api.Statistics;
+import paxel.hopscotch.impl.egress.ConsumerActor;
+import paxel.hopscotch.impl.egress.TerminatorActor;
+import paxel.hopscotch.impl.ingress.IngressActor;
+import paxel.hopscotch.impl.stage.StageActor;
+import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.ActorSettings;
 import paxel.lintstone.api.LintStoneSystem;
 import paxel.lintstone.api.LintStoneSystemFactory;
@@ -14,8 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import static paxel.hopscotch.impl.ConsumerActor.CONSUMER;
-import static paxel.hopscotch.impl.StatisticsActor.STATISTICS;
+import static paxel.hopscotch.impl.egress.ConsumerActor.CONSUMER;
+import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
 /**
  * The implementation of the Pipeline management.
