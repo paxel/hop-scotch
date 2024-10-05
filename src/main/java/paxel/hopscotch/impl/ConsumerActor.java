@@ -1,5 +1,6 @@
 package paxel.hopscotch.impl;
 
+import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
@@ -7,10 +8,14 @@ import paxel.lintstone.api.LintStoneMessageEventContext;
 import java.util.function.Consumer;
 
 public class ConsumerActor<D> implements LintStoneActor {
-    private final Consumer<HopScotchData<D>> consumer;
+    public static final String CONSUMER = "Consumer";
 
-    public ConsumerActor(Consumer<HopScotchData<D>> consumer) {
+    private final Consumer<HopScotchData<D>> consumer;
+    private final Config config;
+
+    public ConsumerActor(Consumer<HopScotchData<D>> consumer, Config config) {
         this.consumer = consumer;
+        this.config = config;
     }
 
     @Override

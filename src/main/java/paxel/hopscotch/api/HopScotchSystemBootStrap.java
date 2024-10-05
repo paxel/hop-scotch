@@ -16,9 +16,9 @@ import java.util.function.Consumer;
 public class HopScotchSystemBootStrap<D> {
 
     private final Map<Integer, List<Object>> factories = new TreeMap<>();
-    private Config config = new Config();
     private Consumer<HopScotchData<D>> consumer = d -> {
     };
+    private int backPressure;
 
     public static HopScotchSystemBootStrap builder() {
         return new HopScotchSystemBootStrap();
@@ -27,7 +27,7 @@ public class HopScotchSystemBootStrap<D> {
     private HopScotchSystemBootStrap() {
     }
 
-    public HopScotchSystemBootStrap add(HopFactory<D> factory) {
+    public HopScotchSystemBootStrap<D> add(JudgeFactory<D> factory) {
         int stage = factory.getStage();
         if (stage < 0)
             throw new IllegalArgumentException("HopFactory must have a stage greater than 0");
@@ -35,7 +35,7 @@ public class HopScotchSystemBootStrap<D> {
         return this;
     }
 
-    public HopScotchSystemBootStrap add(GateFactory<D> factory) {
+    public HopScotchSystemBootStrap<D> add(GateFactory<D> factory) {
         int stage = factory.getStage();
         if (stage < 0)
             throw new IllegalArgumentException("GateFactory must have a stage greater than 0");
@@ -43,9 +43,16 @@ public class HopScotchSystemBootStrap<D> {
         return this;
     }
 
+    public HopScotchSystemBootStrap<D> setBackPressure(int backPressure) {
+        this.backPressure = backPressure;
+        return this;
+    }
+
     public HopScotchSystem build() {
         if (factories.isEmpty())
             throw new IllegalStateException("Need at least one Hop or GateFactory");
+        Config config = new Config(backPressure);
+
         HopScotchSystemImpl hopScotchSystem = new HopScotchSystemImpl(config);
         hopScotchSystem.start(factories, consumer);
         return hopScotchSystem;

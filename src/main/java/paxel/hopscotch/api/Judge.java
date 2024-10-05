@@ -6,5 +6,5 @@ package paxel.hopscotch.api;
  * @param <D> The type of the Data.
  */
 public interface Judge<D> {
-    Judgement judge(HopScotchData<D> data);
+    Judgment judge(HopScotchData<D> data);
 }

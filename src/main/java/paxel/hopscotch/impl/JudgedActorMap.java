@@ -1,9 +1,9 @@
 package paxel.hopscotch.impl;
 
-import paxel.hopscotch.api.HopFactory;
+import paxel.hopscotch.api.JudgeFactory;
 
 public class JudgedActorMap<D> {
-    public void add(HopFactory<D> hopFactory) {
+    public void add(JudgeFactory<D> judgeFactory) {
 
     }
 }

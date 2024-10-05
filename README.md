@@ -59,36 +59,25 @@ Aggregate all original sentences into a PDF
 Predicate: translation exists<br/>
 Aggregate all translated sentences into a PDF
 
-In this example, if you add more Hops in stage 2, you automatically support more languages (if the detector can detect
-them)
-And if you replace the PDF builders with just a French one, you will only have the French PDF. Additionally, if you
-insert a translator from english to French between stage 2 and 3 you will have all texts in French as PDF.
+If you add more Hops in stage 2, you automatically support more languages (if the detector can detect them)
+And if you replace the PDF builders with just a French one, you will only have the French PDF.
+Additionally, if you insert a translator from English to French between stage 2 and 3, you will have all texts in French
+as PDF.
 
 # Types of Hops
 
 To create this hop-scotch, you can implement Two types of Hops:
 
-## Processor
+## Hop
 
-The Processor is given to the hopscotch as an instance if an implementation of `ProcessorHopFactory<D,M>`.<br/>
-Which provides 3 methods:
+A **JudgeFactory** is used to create a **Judge** in the StageActor.
+Whenever Data is received by the Stage, it asks the Judge for a **Judgment** of the Data.
+A positive Judgment can be used to initialize a HopActor that processes all Data that match this Hop.
 
-```java
-int getStage();
-
-Hop<D> createHop(M meta);
-
-Judge<M, D> createJudge();
-```
+The Hop can enrich the given data; however, it is required.
 
 ## Gates
 
 A Gate is a Special Processor that tells the next stage to drop this data.<br/>
 If there are multiple gates on a stage, the next stage will drop the data if any one of them demands the drop.
-
-```java
-int getStage();
-
-Gate<D> createGate();
-```
 

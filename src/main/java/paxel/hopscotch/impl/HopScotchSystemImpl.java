@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import static paxel.hopscotch.impl.ConsumerActor.CONSUMER;
+import static paxel.hopscotch.impl.StatisticsActor.STATISTICS;
+
 /**
  * The implementation of the Pipeline management.
  *
@@ -21,8 +24,10 @@ import java.util.function.Consumer;
  */
 public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
-    public static final String STATISTICS = "Statistics";
-    public static final String CONSUMER = "Consumer";
+    public static final String INGRESS = "Ingress";
+    public static final String TERMINATOR = "Terminator";
+
+
     private final Config config;
     private LintStoneSystem lintStoneSystem;
 
@@ -36,15 +41,17 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         lintStoneSystem = LintStoneSystemFactory.create();
 
         // Collects statistics from all Actors and provides them on demand
-        lintStoneSystem.registerActor(STATISTICS, () -> new StatisticsActor(), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(STATISTICS, () -> new StatisticsActor(config), ActorSettings.DEFAULT);
         // Responsible to add all finished Data to the Consumer
-        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer, config), ActorSettings.DEFAULT);
 
-        String previousName = null;
+        lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(config), ActorSettings.DEFAULT);
+
+        String previousName = INGRESS;
         for (Map.Entry<Integer, List<Object>> integerListEntry : factories.entrySet()) {
             Integer key = integerListEntry.getKey();
             String name = "Stage-" + key;
-            lintStoneSystem.registerActor(name, () -> new StageActor(key, integerListEntry.getValue()), ActorSettings.DEFAULT);
+            lintStoneSystem.registerActor(name, () -> new StageActor(key, integerListEntry.getValue(), config), ActorSettings.DEFAULT);
             if (previousName != null) {
                 // we tell the previous actor what the next stage is
                 lintStoneSystem.getActor(previousName).tell(name);
@@ -52,6 +59,8 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
             previousName = name;
         }
 
+        lintStoneSystem.getActor(previousName).tell(TERMINATOR);
+        lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor(config), ActorSettings.DEFAULT);
 
     }
 
@@ -69,13 +78,13 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
     @Override
     public boolean awaitFinish() {
-        // TODO: await finish
+        // TODO: poison pill and await finish
         return false;
     }
 
     @Override
     public boolean awaitFinish(Duration timeout) {
-        // TODO: await finish
+        // TODO: poison pill and await finish
         return false;
     }
 }

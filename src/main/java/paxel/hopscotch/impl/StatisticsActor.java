@@ -1,11 +1,19 @@
 package paxel.hopscotch.impl;
 
+import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.Statistics;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
 
 public class StatisticsActor implements LintStoneActor {
+    public static final String STATISTICS = "Statistics";
+
     public static final Request REQUEST = new Request("Statistics");
+    private final Config config;
+
+    public StatisticsActor(Config config) {
+        this.config = config;
+    }
 
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
@@ -31,5 +39,8 @@ public class StatisticsActor implements LintStoneActor {
     }
 
     record Request(String request) {
+    }
+
+    record Increment(long value, String... path) {
     }
 }
