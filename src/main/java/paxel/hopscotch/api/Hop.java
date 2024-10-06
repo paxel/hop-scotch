@@ -14,5 +14,5 @@ public interface Hop<D> {
      * @return The enriched data
      */
 
-    HopScotchData<D> process(HopScotchData<D> data);
+    void process(HopScotchData<D> data);
 }

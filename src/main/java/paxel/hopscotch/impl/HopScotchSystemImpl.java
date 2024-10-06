@@ -4,12 +4,15 @@ import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.HopScotchSystem;
 import paxel.hopscotch.api.Statistics;
+import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.impl.data.HopScotchDataImpl;
 import paxel.hopscotch.impl.egress.ConsumerActor;
 import paxel.hopscotch.impl.egress.TerminatorActor;
 import paxel.hopscotch.impl.ingress.IngressActor;
 import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.ActorSettings;
+import paxel.lintstone.api.LintStoneActorAccessor;
 import paxel.lintstone.api.LintStoneSystem;
 import paxel.lintstone.api.LintStoneSystemFactory;
 
@@ -35,6 +38,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
     private final Config config;
     private LintStoneSystem lintStoneSystem;
+    private LintStoneActorAccessor ingress;
 
     public HopScotchSystemImpl(Config config) {
         this.config = config;
@@ -50,13 +54,13 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         // Responsible to add all finished Data to the Consumer
         lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer), ActorSettings.DEFAULT);
 
-        lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(config), ActorSettings.DEFAULT);
+        ingress = lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(config), ActorSettings.DEFAULT);
 
         String previousName = INGRESS;
         for (Map.Entry<Integer, List<Object>> integerListEntry : factories.entrySet()) {
-            Integer key = integerListEntry.getKey();
-            String name = "Stage-" + key;
-            lintStoneSystem.registerActor(name, () -> new StageActor(key, integerListEntry.getValue(), config), ActorSettings.DEFAULT);
+            Integer stage = integerListEntry.getKey();
+            String name = "Stage-" + stage;
+            lintStoneSystem.registerActor(name, () -> new StageActor(new Stage(stage), integerListEntry.getValue(), config), ActorSettings.DEFAULT);
             if (previousName != null) {
                 // we tell the previous actor what the next stage is
                 lintStoneSystem.getActor(previousName).tell(name);
@@ -71,7 +75,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
     @Override
     public void add(D data) {
-        // TODO: signal data to first stage
+        ingress.tell(new HopScotchDataImpl<>(data));
     }
 
     @Override

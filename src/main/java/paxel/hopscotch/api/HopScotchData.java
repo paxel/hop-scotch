@@ -1,12 +1,15 @@
 package paxel.hopscotch.api;
 
 
-import java.util.Properties;
+import paxel.hopscotch.api.enrichment.KeyBuilder;
+import paxel.hopscotch.api.enrichment.QueryBuilder;
 
 public interface HopScotchData<D> {
 
     D getData();
 
-    Properties getEnrichements();
+    KeyBuilder startEnrichment();
+
+    QueryBuilder startEnrichmentQuery();
 
 }

@@ -79,3 +79,16 @@ The Hop can enrich the given data; however, it is required.
 A Gate is a Special Processor that tells the next stage to drop this data.<br/>
 If there are multiple gates on a stage, the next stage will drop the data if any one of them demands the drop.
 
+---
+~~~~
+WIP notes for future Paxel:
+
+* Finish Enrichment
+    * Add Creator and Stage to all Hops and Gates
+    * Implement Copy Method to create a dedicated HopData instance for all Actors
+    * Implement Merge Method for Aggregation
+    * Implement Aggregation
+* Implement Query
+    * All Queries can provide a set of their values (e.g. keys)
+    * All Queries filter the result
+    * All Queries filter for type (e.g Integer)

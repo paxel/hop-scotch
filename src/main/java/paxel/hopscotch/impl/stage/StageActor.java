@@ -1,6 +1,7 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.*;
+import paxel.hopscotch.api.enrichment.Stage;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.ActorSettings;
 import paxel.lintstone.api.LintStoneActor;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
 public class StageActor<D> implements LintStoneActor {
-    private final Integer stage;
+    private final Stage stage;
     private final Config config;
 
     private List<Judge<D>> judges = new ArrayList<>();
@@ -24,7 +25,7 @@ public class StageActor<D> implements LintStoneActor {
     private GateMap gateMap = new GateMap();
     private final DataAggregator<D> aggregator = new DataAggregator();
 
-    public StageActor(Integer stage, List<Object> factories, Config config) {
+    public StageActor(Stage stage, List<Object> factories, Config config) {
         this.stage = stage;
         this.config = config;
         for (Object factory : factories) {
