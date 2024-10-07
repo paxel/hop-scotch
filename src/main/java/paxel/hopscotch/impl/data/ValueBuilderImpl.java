@@ -18,7 +18,7 @@ public class ValueBuilderImpl implements ValueBuilder {
     private final Stage stage;
     private final Consumer<EnrichmentImpl> enrichmentConsumer;
 
-    public ValueBuilderImpl(KeyImpl key, Creator creator, Stage stage, Consumer<EnrichmentImpl> enrichmentConsumer) {
+    public ValueBuilderImpl(KeyImpl key, Consumer<EnrichmentImpl> enrichmentConsumer, Stage stage, Creator creator) {
         this.key = key;
         this.creator = creator;
         this.stage = stage;
@@ -27,61 +27,61 @@ public class ValueBuilderImpl implements ValueBuilder {
 
     @Override
     public void add(String value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.StringValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.StringValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(int value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.IntegerValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.IntegerValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(long value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.LongValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.LongValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(double value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.DoubleValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.DoubleValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(float value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.FloatValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.FloatValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(short value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.ShortValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.ShortValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(BigDecimal value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BigDecimalValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BigDecimalValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(BigInteger value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BigIntegerValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BigIntegerValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public void add(boolean value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BooleanValue(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.BooleanValue(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public <V> void add(V value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.ObjectValue<>(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.ObjectValue<>(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public <V> void addList(Collection<V> value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.CollectionValue<>(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.CollectionValue<>(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 
     @Override
     public <K, V> void addMap(Map<K, V> value) {
-        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.MapValue<>(value), Instant.now(), stage, creator, UUID.randomUUID()));
+        enrichmentConsumer.accept(new EnrichmentImpl(key, new Value.MapValue<>(value), Instant.now(), UUID.randomUUID(), stage, creator));
     }
 }

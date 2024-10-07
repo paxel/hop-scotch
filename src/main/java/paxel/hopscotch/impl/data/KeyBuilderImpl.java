@@ -13,7 +13,7 @@ public class KeyBuilderImpl implements KeyBuilder {
     private final Stage stage;
     private final Consumer<EnrichmentImpl> enrichmentConsumer;
 
-    public KeyBuilderImpl(Creator creator, Stage stage, Consumer<EnrichmentImpl> enrichmentConsumer) {
+    public KeyBuilderImpl(Consumer<EnrichmentImpl> enrichmentConsumer, Stage stage, Creator creator) {
         this.creator = creator;
         this.stage = stage;
         this.enrichmentConsumer = enrichmentConsumer;
@@ -25,6 +25,6 @@ public class KeyBuilderImpl implements KeyBuilder {
             throw new IllegalArgumentException("Key cannot be null or empty");
         }
 
-        return new ValueBuilderImpl(new KeyImpl(key), creator, stage, enrichmentConsumer);
+        return new ValueBuilderImpl(new KeyImpl(key), enrichmentConsumer, stage, creator);
     }
 }

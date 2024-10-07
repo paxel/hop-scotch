@@ -4,6 +4,7 @@ import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.HopScotchSystem;
 import paxel.hopscotch.api.Statistics;
+import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
 import paxel.hopscotch.impl.data.HopScotchDataImpl;
 import paxel.hopscotch.impl.egress.ConsumerActor;
@@ -52,15 +53,15 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         // Collects statistics from all Actors and provides them on demand
         lintStoneSystem.registerActor(STATISTICS, () -> new StatisticsActor(config), ActorSettings.DEFAULT);
         // Responsible to add all finished Data to the Consumer
-        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(consumer), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor(new Creator(CONSUMER), consumer), ActorSettings.DEFAULT);
 
-        ingress = lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(config), ActorSettings.DEFAULT);
+        ingress = lintStoneSystem.registerActor(INGRESS, () -> new IngressActor(new Creator(INGRESS), config), ActorSettings.DEFAULT);
 
         String previousName = INGRESS;
         for (Map.Entry<Integer, List<Object>> integerListEntry : factories.entrySet()) {
             Integer stage = integerListEntry.getKey();
             String name = "Stage-" + stage;
-            lintStoneSystem.registerActor(name, () -> new StageActor(new Stage(stage), integerListEntry.getValue(), config), ActorSettings.DEFAULT);
+            lintStoneSystem.registerActor(name, () -> new StageActor(integerListEntry.getValue(), config, new Stage(stage), new Creator(name)), ActorSettings.DEFAULT);
             if (previousName != null) {
                 // we tell the previous actor what the next stage is
                 lintStoneSystem.getActor(previousName).tell(name);
@@ -69,7 +70,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         }
 
         lintStoneSystem.getActor(previousName).tell(TERMINATOR);
-        lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor(), ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor(new Creator(TERMINATOR)), ActorSettings.DEFAULT);
 
     }
 

@@ -2,6 +2,7 @@ package paxel.hopscotch.impl.ingress;
 
 import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -22,8 +23,10 @@ public class IngressActor<D> implements LintStoneActor {
     private StatisticsActor.Increment incMessage;
     private String firstStage;
     private BiConsumer<LintStoneMessageEventContext, Object> forwarder = (m, d) -> m.getActor(firstStage).tell(d);
+    private final Creator creator;
 
-    public IngressActor(Config config) {
+    public IngressActor(Creator creator, Config config) {
+        this.creator = creator;
         int backPressure = config.backPressure();
         if (backPressure > 0) {
             // replacing the forwarder with backpressure variant if needed.
@@ -55,10 +58,10 @@ public class IngressActor<D> implements LintStoneActor {
     private void ensureMessage(LintStoneMessageEventContext mec) {
         // only create it once, to reduce garbage
         if (incMessage == null)
-            incMessage = new StatisticsActor.Increment(1L, mec.getName(), PROCESSED);
+            incMessage = new StatisticsActor.Increment(1L, null, creator, mec.getName(), PROCESSED);
     }
 
     private void unknown(Object o, LintStoneMessageEventContext mec) {
-        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 }

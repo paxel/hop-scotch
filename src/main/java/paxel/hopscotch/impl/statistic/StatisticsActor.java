@@ -2,6 +2,8 @@ package paxel.hopscotch.impl.statistic;
 
 import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.Statistics;
+import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.enrichment.Stage;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
 
@@ -23,8 +25,6 @@ public class StatisticsActor implements LintStoneActor {
     }
 
     private void unknown(Object o, LintStoneMessageEventContext mec) {
-        // haha
-        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 
 
@@ -44,6 +44,6 @@ public class StatisticsActor implements LintStoneActor {
     public record Request(String request) {
     }
 
-    public record Increment(long value, String... path) {
+    public record Increment(long value, Stage stage, Creator creator, String... path) {
     }
 }

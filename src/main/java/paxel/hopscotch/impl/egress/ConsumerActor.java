@@ -1,6 +1,7 @@
 package paxel.hopscotch.impl.egress;
 
 import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
@@ -12,11 +13,12 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
 public class ConsumerActor<D> implements LintStoneActor {
     public static final String CONSUMER = "Consumer";
-
+    private final Creator creator;
     private final Consumer<HopScotchData<D>> consumer;
     private StatisticsActor.Increment incMessage;
 
-    public ConsumerActor(Consumer<HopScotchData<D>> consumer) {
+    public ConsumerActor(Creator creator, Consumer<HopScotchData<D>> consumer) {
+        this.creator = creator;
         this.consumer = consumer;
     }
 
@@ -33,11 +35,11 @@ public class ConsumerActor<D> implements LintStoneActor {
     private void ensureMessage(LintStoneMessageEventContext mec) {
         // only create it once, to reduce gc
         if (incMessage == null)
-            incMessage = new StatisticsActor.Increment(1L, mec.getName(), PROCESSED);
+            incMessage = new StatisticsActor.Increment(1L, null, creator, mec.getName(), PROCESSED);
     }
 
     private void unknown(Object o, LintStoneMessageEventContext mec) {
-        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 
 
