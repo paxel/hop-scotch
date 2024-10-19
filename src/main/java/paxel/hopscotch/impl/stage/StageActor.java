@@ -90,13 +90,13 @@ public class StageActor<D> implements LintStoneActor {
     }
 
     /**
-     * A split message was received for data that was sent to multiple Gates or Hops. It can only be processed after all results have been received
+     * A split message was received for data that was expectedFragments to multiple Gates or Hops. It can only be processed after all results have been received
      *
      * @param split Defines the number of fragments to await
      * @param mec   The context
      */
     private void updateFragment(Split split, LintStoneMessageEventContext mec) {
-        Optional<HopScotchDataInternal<D>> aggregation = aggregator.update(split.hopScotchData(), split.sent());
+        Optional<HopScotchDataInternal<D>> aggregation = aggregator.update(split.hopScotchData(), split.expectedFragments());
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_split"));
             processCompleteData(aggregation.get(), mec);
@@ -204,7 +204,7 @@ public class StageActor<D> implements LintStoneActor {
         statistix(mec).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 
-    public record Split<D>(HopScotchDataInternal<D> hopScotchData, int sent) {
+    public record Split<D>(HopScotchDataInternal<D> hopScotchData, int expectedFragments) {
     }
 
     public record Drop<D>(HopScotchDataInternal<D> hopScotchData) {

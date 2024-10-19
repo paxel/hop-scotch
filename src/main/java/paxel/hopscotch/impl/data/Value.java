@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
-import java.util.SequencedCollection;
 
 public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Value.LongValue, Value.FloatValue, Value.DoubleValue, Value.StringValue,
         Value.BooleanValue, Value.BigIntegerValue, Value.BigDecimalValue, Value.ObjectValue, Value.CollectionValue, Value.MapValue {

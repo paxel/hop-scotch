@@ -2,33 +2,41 @@ package paxel.hopscotch.impl.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 public class HopScotchDataInternal<D> {
     private final D data;
-
+    private final UUID uuid;
     private final List<EnrichmentImpl> enrichments;
 
     /**
-     * Constructs an instance with existing enrichments.
-     * @param data The data
-     * @param enrichments The existing enrichments
-     */
-    public HopScotchDataInternal(D data, List<EnrichmentImpl> enrichments) {
-        this.data = data;
-        this.enrichments = enrichments;
-    }
-
-    /**
      * Constructs an instance.
+     *
      * @param data The data
      */
     public HopScotchDataInternal(D data) {
-        this.data = data;
-        this.enrichments = new ArrayList<>();
+        this(data, new ArrayList<>(), UUID.randomUUID());
     }
 
     /**
+     * Constructs an instance with existing enrichments.
+     *
+     * @param data        The data
+     * @param enrichments The existing enrichments
+     * @param uuid        The existing uuid
+     */
+    public HopScotchDataInternal(D data, List<EnrichmentImpl> enrichments, UUID uuid) {
+        this.data = requireNonNull(data);
+        this.enrichments = requireNonNull(enrichments);
+        this.uuid = requireNonNull(uuid);
+    }
+
+
+    /**
      * Retrieve the data
+     *
      * @return the data
      */
     public D getData() {
@@ -38,7 +46,7 @@ public class HopScotchDataInternal<D> {
     public HopScotchDataInternal<D> copy() {
 
         // For the future: make an immutable instance of the data.
-        return new HopScotchDataInternal<>(data, new ArrayList<>(enrichments));
+        return new HopScotchDataInternal<>(data, new ArrayList<>(enrichments), uuid);
     }
 
     /**
@@ -57,5 +65,9 @@ public class HopScotchDataInternal<D> {
      */
     public List<EnrichmentImpl> getEnrichments() {
         return List.copyOf(enrichments);
+    }
+
+    public UUID getId() {
+        return uuid;
     }
 }
