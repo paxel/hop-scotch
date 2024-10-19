@@ -5,6 +5,7 @@ import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.KeyBuilder;
 import paxel.hopscotch.api.enrichment.QueryBuilder;
 import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.impl.enrichment.KeyBuilderImpl;
 
 /**
  * The wrapper for the data and enrichments that is given to Gates, Judges and Hops.

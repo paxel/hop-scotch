@@ -1,4 +1,4 @@
-package paxel.hopscotch.impl.data;
+package paxel.hopscotch.impl.enrichment;
 
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;

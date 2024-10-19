@@ -1,5 +1,7 @@
 package paxel.hopscotch.impl.data;
 
+import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

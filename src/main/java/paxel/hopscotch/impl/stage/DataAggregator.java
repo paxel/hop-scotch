@@ -1,7 +1,7 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.enrichment.Key;
-import paxel.hopscotch.impl.data.EnrichmentImpl;
+import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 
 import java.util.*;

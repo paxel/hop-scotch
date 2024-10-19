@@ -1,4 +1,4 @@
-package paxel.hopscotch.impl.data;
+package paxel.hopscotch.impl.enrichment;
 
 
 import java.math.BigDecimal;

@@ -1,9 +1,6 @@
-package paxel.hopscotch.impl.data;
+package paxel.hopscotch.impl.enrichment;
 
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.KeyBuilder;
-import paxel.hopscotch.api.enrichment.Stage;
-import paxel.hopscotch.api.enrichment.ValueBuilder;
+import paxel.hopscotch.api.enrichment.*;
 
 import java.util.function.Consumer;
 
@@ -29,12 +26,15 @@ public class KeyBuilderImpl implements KeyBuilder {
         this.enrichmentConsumer = enrichmentConsumer;
     }
 
+
     @Override
-    public ValueBuilder key(String key) {
-        if (key == null || key.isEmpty()) {
+    public ValueBuilder forKey(Key key) {
+        if (key == null) {
             throw new IllegalArgumentException("Key cannot be null or empty");
         }
-
-        return new ValueBuilderImpl(new KeyImpl(key), enrichmentConsumer, stage, creator);
+        if (key instanceof KeyImpl keyImpl) {
+            return new ValueBuilderImpl(keyImpl, enrichmentConsumer, stage, creator);
+        }
+        throw new IllegalArgumentException("Unknown key type " + key.getClass());
     }
 }
