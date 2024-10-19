@@ -6,7 +6,12 @@ import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
 
-public class HopScotchDataInternal<D> {
+/**
+ * The Container for the original data and the enrichments.
+ *
+ * @param <D> The data type
+ */
+public class HopScotchEnrichedData<D> {
     private final D data;
     private final UUID uuid;
     private final List<EnrichmentImpl> enrichments;
@@ -16,7 +21,7 @@ public class HopScotchDataInternal<D> {
      *
      * @param data The data
      */
-    public HopScotchDataInternal(D data) {
+    public HopScotchEnrichedData(D data) {
         this(data, new ArrayList<>(), UUID.randomUUID());
     }
 
@@ -27,7 +32,7 @@ public class HopScotchDataInternal<D> {
      * @param enrichments The existing enrichments
      * @param uuid        The existing uuid
      */
-    public HopScotchDataInternal(D data, List<EnrichmentImpl> enrichments, UUID uuid) {
+    public HopScotchEnrichedData(D data, List<EnrichmentImpl> enrichments, UUID uuid) {
         this.data = requireNonNull(data);
         this.enrichments = requireNonNull(enrichments);
         this.uuid = requireNonNull(uuid);
@@ -43,10 +48,15 @@ public class HopScotchDataInternal<D> {
         return data;
     }
 
-    public HopScotchDataInternal<D> copy() {
+    /**
+     * Create a mutable copy of this data.
+     *
+     * @return a copy of this data
+     */
+    public HopScotchEnrichedData<D> copy() {
 
         // For the future: make an immutable instance of the data.
-        return new HopScotchDataInternal<>(data, new ArrayList<>(enrichments), uuid);
+        return new HopScotchEnrichedData<>(data, new ArrayList<>(enrichments), uuid);
     }
 
     /**
@@ -67,6 +77,11 @@ public class HopScotchDataInternal<D> {
         return List.copyOf(enrichments);
     }
 
+    /**
+     * Retrieve the unique ID
+     *
+     * @return The unique ID of this data
+     */
     public UUID getId() {
         return uuid;
     }

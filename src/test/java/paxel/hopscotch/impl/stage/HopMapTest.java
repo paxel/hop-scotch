@@ -1,6 +1,7 @@
 package paxel.hopscotch.impl.stage;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import paxel.hopscotch.api.HopId;
 import paxel.lintstone.api.LintStoneActorAccessor;
 
@@ -11,7 +12,7 @@ class HopMapTest {
 
     @Test
     void testCreate() {
-        assertThat(new HopMap().computeIfAbsent(1, mock(), () -> mock())).isNotNull();
+        assertThat(new HopMap().computeIfAbsent(1, mock(), Mockito::mock)).isNotNull();
     }
 
     @Test

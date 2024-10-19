@@ -11,12 +11,24 @@ import java.util.function.Consumer;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.PROCESSED;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
+/**
+ * An Actor that forwards all finished data to the defined consumer
+ * @param <D> The data type
+ */
 public class ConsumerActor<D> implements LintStoneActor {
+    /**
+     * The name of the actor
+     */
     public static final String CONSUMER = "Consumer";
     private final Creator creator;
     private final Consumer<HopScotchData<D>> consumer;
     private StatisticsActor.Increment incMessage;
 
+    /**
+     * Constructs an instance of this actor
+     * @param creator The creator
+     * @param consumer The given consumer or null
+     */
     public ConsumerActor(Creator creator, Consumer<HopScotchData<D>> consumer) {
         this.creator = creator;
         this.consumer = consumer;

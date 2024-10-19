@@ -11,7 +11,6 @@ public interface Hop<D> {
      * This process can read the HopScotchData and
      *
      * @param data The previous stage data
-     * @return The enriched data
      */
 
     void process(HopScotchData<D> data);

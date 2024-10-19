@@ -10,10 +10,26 @@ import static paxel.hopscotch.impl.egress.ConsumerActor.CONSUMER;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.PROCESSED;
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
-public class TerminatorActor implements LintStoneActor {
+/**
+ * The Terminator actor is the last Stage, that will forward all Data that was not dropped to the ConsumerActor.
+ *
+ * @param <D> The data type
+ */
+public class TerminatorActor<D> implements LintStoneActor {
     private final Creator creator;
     private StatisticsActor.Increment incMessage;
 
+
+    /**
+     * The name of this actor
+     */
+    public static final String TERMINATOR = "Terminator";
+
+    /**
+     * Constructs an instance with a Creator. The last stage has no stage
+     *
+     * @param creator The creator
+     */
     public TerminatorActor(Creator creator) {
         this.creator = creator;
     }
@@ -25,7 +41,7 @@ public class TerminatorActor implements LintStoneActor {
     }
 
 
-    private void processData(HopScotchData hopScotchData, LintStoneMessageEventContext mec) {
+    private void processData(HopScotchData<D> hopScotchData, LintStoneMessageEventContext mec) {
         ensureMessage(mec);
         mec.getActor(STATISTICS).tell(incMessage);
         mec.getActor(CONSUMER).tell(hopScotchData);

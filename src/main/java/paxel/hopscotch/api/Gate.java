@@ -1,5 +1,12 @@
 package paxel.hopscotch.api;
 
+/**
+ * A gate needs to be implemented by the user.
+ * It will receive all Data passing a Stage and can decide for each that it should be dropped.
+ * If any Gate returns false, the next Stage will drop the aggregated data.
+ *
+ * @param <D> The data type
+ */
 public interface Gate<D> {
 
     /**

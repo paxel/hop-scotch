@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
-import java.util.SequencedCollection;
 
 /**
  * The ValueBuilder actually adds a value to the Enrichment.
@@ -24,7 +23,7 @@ public interface ValueBuilder {
     void add(String value);
 
     /**
-     * Add a integer with the given key to the enrichment.
+     * Add an integer with the given key to the enrichment.
      *
      * @param value the value of the enrichment.
      */
@@ -80,9 +79,10 @@ public interface ValueBuilder {
     void add(boolean value);
 
     /**
-     * Add a Object with the given key to the enrichment.
+     * Add an Object with the given key to the enrichment.
      *
      * @param value the value of the enrichment. Can be null
+     * @param <V>   The value type
      */
     <V> void add(V value);
 
@@ -92,6 +92,7 @@ public interface ValueBuilder {
      * The order in the collection should stay the same, but that is not guaranteed.
      *
      * @param value the value of the enrichment. Can be null or empty
+     * @param <V>   The value type
      */
     <V> void addList(Collection<V> value);
 
@@ -101,6 +102,8 @@ public interface ValueBuilder {
      * The order in the map should stay the same, but that is not guaranteed.
      *
      * @param value the value of the enrichment. Can be null or empty
+     * @param <V>   The value type
+     * @param <K>   The Key type
      */
     <K, V> void addMap(Map<K, V> value);
 }

@@ -4,20 +4,34 @@ import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.Hop;
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
-import paxel.hopscotch.impl.data.HopScotchDataInternal;
-import paxel.hopscotch.impl.data.HopScotchDataWrapper;
+import paxel.hopscotch.impl.data.HopScotchEnrichedData;
+import paxel.hopscotch.impl.data.HopScotchEnrichedDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
 
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
+/**
+ * Actor responsible to process data with a Hop
+ *
+ * @param <D> The data type
+ */
 public class HopActor<D> implements LintStoneActor {
     private final Hop<D> hop;
     private final String nextStageName;
     private final Creator creator;
     private final Stage stage;
 
+    /**
+     * Constructs the Actor
+     *
+     * @param hop           The hop
+     * @param nextStageName The next stage
+     * @param config        The config
+     * @param stage         The stage
+     * @param creator       The creator
+     */
     public HopActor(Hop<D> hop, String nextStageName, Config config, Stage stage, Creator creator) {
         this.hop = hop;
         this.nextStageName = nextStageName;
@@ -27,14 +41,14 @@ public class HopActor<D> implements LintStoneActor {
 
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
-        mec.inCase(HopScotchDataInternal.class, this::processData)
+        mec.inCase(HopScotchEnrichedData.class, this::processData)
                 .otherwise(this::unknown);
     }
 
-    private void processData(HopScotchDataInternal<D> hopScotchData, LintStoneMessageEventContext mec) {
+    private void processData(HopScotchEnrichedData<D> hopScotchData, LintStoneMessageEventContext mec) {
         int originalHash = hopScotchData.getData().hashCode();
         try {
-            HopScotchDataWrapper<D> wrapper = new HopScotchDataWrapper<>(hopScotchData,stage,creator);
+            HopScotchEnrichedDataWrapper<D> wrapper = new HopScotchEnrichedDataWrapper<>(hopScotchData, stage, creator);
             hop.process(wrapper);
             int postProcessHash = hopScotchData.getData().hashCode();
             if (originalHash != postProcessHash) {

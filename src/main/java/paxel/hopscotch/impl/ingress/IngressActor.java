@@ -2,7 +2,7 @@ package paxel.hopscotch.impl.ingress;
 
 import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.impl.data.HopScotchDataInternal;
+import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -20,11 +20,23 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
  * @param <D> The type of the data
  */
 public class IngressActor<D> implements LintStoneActor {
+
+    /**
+     * The name of this actor
+     */
+    public static final String INGRESS = "Ingress";
+
     private StatisticsActor.Increment incMessage;
     private String firstStage;
     private BiConsumer<LintStoneMessageEventContext, Object> forwarder = (m, d) -> m.getActor(firstStage).tell(d);
     private final Creator creator;
 
+    /**
+     * Constructs an instance. This Stage has no Stage
+     *
+     * @param creator The creator
+     * @param config  The config
+     */
     public IngressActor(Creator creator, Config config) {
         this.creator = creator;
         int backPressure = config.backPressure();
@@ -45,11 +57,15 @@ public class IngressActor<D> implements LintStoneActor {
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         mec.inCase(String.class, (firstStageName, b) -> this.firstStage = firstStageName)
-                .inCase(HopScotchDataInternal.class, this::processData)
+                .inCase(HopScotchEnrichedData.class, this::processData)
                 .otherwise(this::unknown);
     }
 
-    private void processData(HopScotchDataInternal<D> hopScotchData, LintStoneMessageEventContext mec) {
+    private void ignore(String s, LintStoneMessageEventContext lintStoneMessageEventContext) {
+        // The first stage sends us its name. We know it already
+    }
+
+    private void processData(HopScotchEnrichedData<D> hopScotchData, LintStoneMessageEventContext mec) {
         ensureMessage(mec);
         mec.getActor(STATISTICS).tell(incMessage);
         forwarder.accept(mec, new StageActor.Single<>(hopScotchData));

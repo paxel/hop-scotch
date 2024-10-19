@@ -1,6 +1,7 @@
 package paxel.hopscotch.impl.stage;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import paxel.lintstone.api.LintStoneActorAccessor;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -10,7 +11,7 @@ class GateMapTest {
 
     @Test
     void testCreate() {
-        assertThat(new GateMap().computeIfAbsent(1, () -> mock())).isNotNull();
+        assertThat(new GateMap().computeIfAbsent(1, Mockito::mock)).isNotNull();
     }
 
     @Test

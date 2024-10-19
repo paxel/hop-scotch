@@ -7,6 +7,9 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Represents the Statistics of the whole system
+ */
 public class MutableStatistic implements Statistics {
 
 

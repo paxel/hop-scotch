@@ -18,7 +18,7 @@ with:
 
 Everything else is up to the user to implement.
 
-The benefit is of course: If you add a stage in the middle, or you remove a stage, or you replace a stage, you just have
+The benefit is, of course: If you add a stage in the middle, or you remove a stage, or you replace a stage, you have
 to change the parameters you feed to the hop scotch and run it again, without changing the whole logic behind.
 
 # An example
@@ -31,28 +31,28 @@ The Data are sentences.
 **Hop 1 - Language detector**
 
 Predicate: all<br/>
-Enriches the sentence with the "language" of the text (e.g. French)
+Enriches the sentence with the "language" of the text (e.g., French)
 
 **Stage 2**
 
-**Hop 1 - French translator**
+**Hop 1: French translator**
 
 Predicate: language: French<br/>
 Enriches the sentence with an english translation of the French original
 
-**Hop 2 - German translator**
+**Hop 2: German translator**
 
 Predicate: language: german<br/>
 Enriches the sentence with an english translation of the german original
 
 **Stage 3**
 
-**Hop 1 - PDF Builder (original)**
+**Hop 1: PDF Builder (original)**
 
 Predicate: all<br/>
 Aggregate all original sentences into a PDF
 
-**Hop 2 - PDF Builder (translated)**
+**Hop 2: PDF Builder (translated)**
 
 Predicate: translation exists<br/>
 Aggregate all translated sentences into a PDF
@@ -85,8 +85,10 @@ If there are multiple gates on a stage, the next stage will drop the data if any
 WIP notes for future Paxel:
 
 * Finish Enrichment
+    * Poison pill shutdown 🛠️
     * Aggregation unit test 🛠️
     * KeyBuilder implementation and unit test 🛠️ 
+    * Javadoc and CI working 🛠️
     * Implement Aggregation ✅
     * Implement Merge Method for Aggregation ✅
     * Implement Copy Method to create a dedicated HopData instance for all Actors ✅

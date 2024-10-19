@@ -12,12 +12,23 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Implementation of the {@link ValueBuilder} interface
+ */
 public class ValueBuilderImpl implements ValueBuilder {
     private final KeyImpl key;
     private final Creator creator;
     private final Stage stage;
     private final Consumer<EnrichmentImpl> enrichmentConsumer;
 
+    /**
+     * Constructs an instance of a Builder
+     *
+     * @param key                The key
+     * @param enrichmentConsumer The receiver of the value
+     * @param stage              The stage
+     * @param creator            The creator
+     */
     public ValueBuilderImpl(KeyImpl key, Consumer<EnrichmentImpl> enrichmentConsumer, Stage stage, Creator creator) {
         this.key = key;
         this.creator = creator;

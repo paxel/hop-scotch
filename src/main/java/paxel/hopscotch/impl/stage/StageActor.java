@@ -3,8 +3,8 @@ package paxel.hopscotch.impl.stage;
 import paxel.hopscotch.api.*;
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
-import paxel.hopscotch.impl.data.HopScotchDataInternal;
-import paxel.hopscotch.impl.data.HopScotchDataWrapper;
+import paxel.hopscotch.impl.data.HopScotchEnrichedData;
+import paxel.hopscotch.impl.data.HopScotchEnrichedDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.ActorSettings;
 import paxel.lintstone.api.LintStoneActor;
@@ -17,21 +17,34 @@ import java.util.Optional;
 
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
+/**
+ * Actor for muxing and demuxing and dropping data on each stage
+ *
+ * @param <D> The data type
+ */
 public class StageActor<D> implements LintStoneActor {
     private final Creator creator;
     private final Stage stage;
     private final Config config;
     private final int backPressure;
 
-    private List<Judge<D>> judges = new ArrayList<>();
-    private List<GateFactory<D>> gateFactories = new ArrayList<>();
+    private final List<Judge<D>> judges = new ArrayList<>();
+    private final List<GateFactory<D>> gateFactories = new ArrayList<>();
     private String nextStageName;
-    private HopMap hopMap = new HopMap();
-    private GateMap gateMap = new GateMap();
-    private final DataAggregator<D> aggregator = new DataAggregator();
+    private final HopMap hopMap = new HopMap();
+    private final GateMap gateMap = new GateMap();
+    private final DataAggregator<D> aggregator = new DataAggregator<>();
     private LintStoneActorAccessor nextStage;
     private LintStoneActorAccessor statistix;
 
+    /**
+     * Constructs an Actor.
+     *
+     * @param factories The factories of this stage
+     * @param config    The config
+     * @param stage     The stage
+     * @param creator   The creator
+     */
     public StageActor(List<Object> factories, Config config, Stage stage, Creator creator) {
         backPressure = config.backPressure();
         this.config = config;
@@ -39,18 +52,10 @@ public class StageActor<D> implements LintStoneActor {
         this.stage = stage;
         for (Object factory : factories) {
             switch (factory) {
-                case JudgeFactory<?> hf -> {
-                    judges.add(((JudgeFactory<D>) hf).createJudge());
-                }
-                case GateFactory<?> gf -> {
-                    gateFactories.add(((GateFactory<D>) gf));
-                }
-                case null -> {
-                    throw new IllegalArgumentException("Factory must not be null");
-                }
-                default -> {
-                    throw new IllegalArgumentException("Unknown factory type: " + factory.getClass());
-                }
+                case JudgeFactory<?> hf -> judges.add(((JudgeFactory<D>) hf).createJudge());
+                case GateFactory<?> gf -> gateFactories.add(((GateFactory<D>) gf));
+                case null -> throw new IllegalArgumentException("Factory must not be null");
+                default -> throw new IllegalArgumentException("Unknown factory type: " + factory.getClass());
             }
         }
     }
@@ -65,7 +70,7 @@ public class StageActor<D> implements LintStoneActor {
                 .otherwise(this::unknown);
     }
 
-    private void dropData(Drop drop, LintStoneMessageEventContext mec) {
+    private void dropData(Drop<D> drop, LintStoneMessageEventContext mec) {
         statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "dropped"));
         aggregator.drop(drop.hopScotchData());
     }
@@ -84,7 +89,7 @@ public class StageActor<D> implements LintStoneActor {
      * @param single The single containing the data
      * @param mec    The context
      */
-    private void processSingle(Single single, LintStoneMessageEventContext mec) {
+    private void processSingle(Single<D> single, LintStoneMessageEventContext mec) {
         statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "single"));
         processCompleteData(single.hopScotchData(), mec);
     }
@@ -95,17 +100,17 @@ public class StageActor<D> implements LintStoneActor {
      * @param split Defines the number of fragments to await
      * @param mec   The context
      */
-    private void updateFragment(Split split, LintStoneMessageEventContext mec) {
-        Optional<HopScotchDataInternal<D>> aggregation = aggregator.update(split.hopScotchData(), split.expectedFragments());
+    private void updateFragment(Split<D> split, LintStoneMessageEventContext mec) {
+        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.update(split.hopScotchData(), split.expectedFragments());
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_split"));
             processCompleteData(aggregation.get(), mec);
         }
     }
 
-    private void processFragment(Fragment fragment, LintStoneMessageEventContext mec) {
+    private void processFragment(Fragment<D> fragment, LintStoneMessageEventContext mec) {
         statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "fragment", StatisticsActor.PROCESSED));
-        Optional<HopScotchDataInternal<D>> aggregation = aggregator.add(fragment.hopScotchData());
+        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.add(fragment.hopScotchData());
 
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_fragment"));
@@ -113,7 +118,7 @@ public class StageActor<D> implements LintStoneActor {
         }
     }
 
-    private void processCompleteData(HopScotchDataInternal<D> data, LintStoneMessageEventContext mec) {
+    private void processCompleteData(HopScotchEnrichedData<D> data, LintStoneMessageEventContext mec) {
 
         int sent = distributeData(mec, data);
         // Notify the next stage about the number of splits to merge
@@ -147,13 +152,13 @@ public class StageActor<D> implements LintStoneActor {
     }
 
 
-    private int distributeData(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
+    private int distributeData(LintStoneMessageEventContext mec, HopScotchEnrichedData<D> aggregation) {
         int hops = sendToHops(mec, aggregation);
         int gates = sendToGates(mec, aggregation);
         return hops + gates;
     }
 
-    private int sendToGates(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
+    private int sendToGates(LintStoneMessageEventContext mec, HopScotchEnrichedData<D> aggregation) {
         int gateNumber = 0;
         for (GateFactory<D> gate : gateFactories) {
             gateNumber++;
@@ -164,10 +169,10 @@ public class StageActor<D> implements LintStoneActor {
         return gateNumber;
     }
 
-    private int sendToHops(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
+    private int sendToHops(LintStoneMessageEventContext mec, HopScotchEnrichedData<D> aggregation) {
         int sent = 0;
         int hopNumber = 0;
-        HopScotchDataWrapper<D> data = new HopScotchDataWrapper<>(aggregation, stage, creator);
+        HopScotchEnrichedDataWrapper<D> data = new HopScotchEnrichedDataWrapper<>(aggregation, stage, creator);
         for (Judge<D> judge : judges) {
             hopNumber++;
             Judgment<D> judgement = judge.judge(data);
@@ -186,7 +191,7 @@ public class StageActor<D> implements LintStoneActor {
             Gate<D> gate = gateFactory.createGate();
             String name = "Gate_" + stage + "_" + gateNumber + "_" + gate.getClass().getSimpleName();
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "gate", "created"));
-            return mec.registerActor(name, () -> new GateActor(gate, nextStageName, config, stage, new Creator(gate.getClass().getSimpleName() + "_" + gateNumber)), ActorSettings.DEFAULT);
+            return mec.registerActor(name, () -> new GateActor<>(gate, nextStageName, stage, new Creator(gate.getClass().getSimpleName() + "_" + gateNumber)), ActorSettings.DEFAULT);
         });
     }
 
@@ -195,7 +200,7 @@ public class StageActor<D> implements LintStoneActor {
             Hop<D> hop = judgement.createHop();
             String name = "Hop." + stage + "." + hopNumber + "." + hop.getClass().getSimpleName() + "." + id.id();
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "hop", "created"));
-            return mec.registerActor(name, () -> new HopActor(hop, nextStageName, config, stage, new Creator(hop.getClass().getSimpleName() + "_" + hopNumber)), ActorSettings.DEFAULT);
+            return mec.registerActor(name, () -> new HopActor<>(hop, nextStageName, config, stage, new Creator(hop.getClass().getSimpleName() + "_" + hopNumber)), ActorSettings.DEFAULT);
         });
     }
 
@@ -204,15 +209,40 @@ public class StageActor<D> implements LintStoneActor {
         statistix(mec).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 
-    public record Split<D>(HopScotchDataInternal<D> hopScotchData, int expectedFragments) {
+    /**
+     * A Split message defines the number of fragments created on the previous stage.
+     *
+     * @param hopScotchData     The data
+     * @param expectedFragments The number of fragments
+     * @param <D>               The data type
+     */
+    public record Split<D>(HopScotchEnrichedData<D> hopScotchData, int expectedFragments) {
     }
 
-    public record Drop<D>(HopScotchDataInternal<D> hopScotchData) {
+    /**
+     * A Drop message defines a Gate decision to drop on the previous stage
+     *
+     * @param hopScotchData The data
+     * @param <D>           The data type
+     */
+    public record Drop<D>(HopScotchEnrichedData<D> hopScotchData) {
     }
 
-    public record Single<D>(HopScotchDataInternal<D> hopScotchData) {
+    /**
+     * The message was not delegated to any Hop or Gate on the previous stage
+     *
+     * @param hopScotchData The data
+     * @param <D>           The data type
+     */
+    public record Single<D>(HopScotchEnrichedData<D> hopScotchData) {
     }
 
-    public record Fragment<D>(HopScotchDataInternal<D> hopScotchData) {
+    /**
+     * This is one result from a Gate or a Hop of multiple.
+     *
+     * @param hopScotchData The data
+     * @param <D>           The data type
+     */
+    public record Fragment<D>(HopScotchEnrichedData<D> hopScotchData) {
     }
 }
