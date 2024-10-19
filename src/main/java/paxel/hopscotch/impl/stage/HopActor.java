@@ -4,7 +4,7 @@ import paxel.hopscotch.api.Config;
 import paxel.hopscotch.api.Hop;
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
-import paxel.hopscotch.impl.data.HopScotchDataImpl;
+import paxel.hopscotch.impl.data.HopScotchDataInternal;
 import paxel.hopscotch.impl.data.HopScotchDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -27,14 +27,14 @@ public class HopActor<D> implements LintStoneActor {
 
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
-        mec.inCase(HopScotchDataImpl.class, this::processData)
+        mec.inCase(HopScotchDataInternal.class, this::processData)
                 .otherwise(this::unknown);
     }
 
-    private void processData(HopScotchDataImpl<D> hopScotchData, LintStoneMessageEventContext mec) {
+    private void processData(HopScotchDataInternal<D> hopScotchData, LintStoneMessageEventContext mec) {
         int originalHash = hopScotchData.getData().hashCode();
         try {
-            HopScotchDataWrapper<D> wrapper = new HopScotchDataWrapper<>(hopScotchData);
+            HopScotchDataWrapper<D> wrapper = new HopScotchDataWrapper<>(hopScotchData,stage,creator);
             hop.process(wrapper);
             int postProcessHash = hopScotchData.getData().hashCode();
             if (originalHash != postProcessHash) {

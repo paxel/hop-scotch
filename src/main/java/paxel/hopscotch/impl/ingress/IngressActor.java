@@ -1,8 +1,8 @@
 package paxel.hopscotch.impl.ingress;
 
 import paxel.hopscotch.api.Config;
-import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.impl.data.HopScotchDataInternal;
 import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
@@ -45,11 +45,11 @@ public class IngressActor<D> implements LintStoneActor {
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         mec.inCase(String.class, (firstStageName, b) -> this.firstStage = firstStageName)
-                .inCase(HopScotchData.class, this::processData)
+                .inCase(HopScotchDataInternal.class, this::processData)
                 .otherwise(this::unknown);
     }
 
-    private void processData(HopScotchData hopScotchData, LintStoneMessageEventContext mec) {
+    private void processData(HopScotchDataInternal<D> hopScotchData, LintStoneMessageEventContext mec) {
         ensureMessage(mec);
         mec.getActor(STATISTICS).tell(incMessage);
         forwarder.accept(mec, new StageActor.Single<>(hopScotchData));

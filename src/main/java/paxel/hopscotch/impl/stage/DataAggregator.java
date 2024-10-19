@@ -1,20 +1,21 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.impl.data.HopScotchDataInternal;
 
 import java.util.Optional;
 
 public class DataAggregator<D> {
 
-    public Optional<HopScotchData<D>> update(HopScotchData hopScotchData, int sent) {
+    public Optional<HopScotchDataInternal<D>> update(HopScotchDataInternal<D> hopScotchData, int sent) {
         return Optional.empty();
     }
 
-    public Optional<HopScotchData<D>> add(HopScotchData<D> fragment) {
+    public Optional<HopScotchDataInternal<D>> add(HopScotchDataInternal<D> fragment) {
         return Optional.empty();
     }
 
-    public void drop(HopScotchData hopScotchData) {
+    public void drop(HopScotchDataInternal<D> hopScotchData) {
 
     }
 }

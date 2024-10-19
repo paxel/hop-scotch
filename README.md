@@ -85,11 +85,11 @@ If there are multiple gates on a stage, the next stage will drop the data if any
 WIP notes for future Paxel:
 
 * Finish Enrichment
+    * Implement Aggregation 🛠️
+    * Implement Merge Method for Aggregation 🛠️
+    * Implement Copy Method to create a dedicated HopData instance for all Actors ✅
     * Add Creator and Stage to all Hops and Gates ✅
     * Add backpressure to all StageActors ✅
-    * Implement Copy Method to create a dedicated HopData instance for all Actors 🛠️
-    * Implement Merge Method for Aggregation 🛠️
-    * Implement Aggregation 🛠️
 * Implement Query
     * All Queries can provide a set of their values (e.g. keys) 🛠️
     * All Queries filter the result 🛠️

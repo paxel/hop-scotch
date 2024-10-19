@@ -6,7 +6,7 @@ import paxel.hopscotch.api.HopScotchSystem;
 import paxel.hopscotch.api.Statistics;
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
-import paxel.hopscotch.impl.data.HopScotchDataImpl;
+import paxel.hopscotch.impl.data.HopScotchDataInternal;
 import paxel.hopscotch.impl.egress.ConsumerActor;
 import paxel.hopscotch.impl.egress.TerminatorActor;
 import paxel.hopscotch.impl.ingress.IngressActor;
@@ -76,7 +76,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
     @Override
     public void add(D data) {
-        ingress.tell(new HopScotchDataImpl<>(data));
+        ingress.tell(new HopScotchDataInternal<>(data));
     }
 
     @Override

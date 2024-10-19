@@ -3,6 +3,8 @@ package paxel.hopscotch.impl.stage;
 import paxel.hopscotch.api.*;
 import paxel.hopscotch.api.enrichment.Creator;
 import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.impl.data.HopScotchDataInternal;
+import paxel.hopscotch.impl.data.HopScotchDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.ActorSettings;
 import paxel.lintstone.api.LintStoneActor;
@@ -94,17 +96,16 @@ public class StageActor<D> implements LintStoneActor {
      * @param mec   The context
      */
     private void updateFragment(Split split, LintStoneMessageEventContext mec) {
-        Optional<HopScotchData<D>> aggregation = aggregator.update(split.hopScotchData(), split.sent());
+        Optional<HopScotchDataInternal<D>> aggregation = aggregator.update(split.hopScotchData(), split.sent());
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_split"));
             processCompleteData(aggregation.get(), mec);
-
         }
     }
 
     private void processFragment(Fragment fragment, LintStoneMessageEventContext mec) {
         statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "fragment", StatisticsActor.PROCESSED));
-        Optional<HopScotchData<D>> aggregation = aggregator.add(fragment.hopScotchData());
+        Optional<HopScotchDataInternal<D>> aggregation = aggregator.add(fragment.hopScotchData());
 
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_fragment"));
@@ -112,17 +113,17 @@ public class StageActor<D> implements LintStoneActor {
         }
     }
 
-    private void processCompleteData(HopScotchData<D> data, LintStoneMessageEventContext mec) {
+    private void processCompleteData(HopScotchDataInternal<D> data, LintStoneMessageEventContext mec) {
 
         int sent = distributeData(mec, data);
         // Notify the next stage about the number of splits to merge
         if (sent == 0) {
             // this data was not given to any Gate or Hop, so we just forward it to the next stage
-            tellNextStage(mec, new Single<>(data));
-            statistix(mec).tell(new StatisticsActor.Increment(sent, stage, creator, mec.getName(), "fragmented"));
-        } else {
-            tellNextStage(mec, new Split<>(data, sent));
+            tellNextStage(mec, new Single<>(data.copy()));
             statistix(mec).tell(new StatisticsActor.Increment(sent, stage, creator, mec.getName(), "forwarded"));
+        } else {
+            tellNextStage(mec, new Split<>(data.copy(), sent));
+            statistix(mec).tell(new StatisticsActor.Increment(sent, stage, creator, mec.getName(), "fragmented"));
         }
     }
 
@@ -146,33 +147,34 @@ public class StageActor<D> implements LintStoneActor {
     }
 
 
-    private int distributeData(LintStoneMessageEventContext mec, HopScotchData<D> aggregation) {
+    private int distributeData(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
         int hops = sendToHops(mec, aggregation);
         int gates = sendToGates(mec, aggregation);
         return hops + gates;
     }
 
-    private int sendToGates(LintStoneMessageEventContext mec, HopScotchData<D> aggregation) {
+    private int sendToGates(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
         int gateNumber = 0;
         for (GateFactory<D> gate : gateFactories) {
             gateNumber++;
             LintStoneActorAccessor actor = getGateActor(mec, gateNumber, gate);
             // forward message to hop
-            actor.tell(aggregation);
+            actor.tell(aggregation.copy());
         }
         return gateNumber;
     }
 
-    private int sendToHops(LintStoneMessageEventContext mec, HopScotchData<D> aggregation) {
+    private int sendToHops(LintStoneMessageEventContext mec, HopScotchDataInternal<D> aggregation) {
         int sent = 0;
         int hopNumber = 0;
+        HopScotchDataWrapper<D> data = new HopScotchDataWrapper<>(aggregation, stage, creator);
         for (Judge<D> judge : judges) {
             hopNumber++;
-            Judgment<D> judgement = judge.judge(aggregation);
+            Judgment<D> judgement = judge.judge(data);
             if (judgement.isAccepted()) {
                 LintStoneActorAccessor actor = getHopActor(mec, hopNumber, judgement.getId(), judgement);
                 // forward message to hop
-                actor.tell(aggregation);
+                actor.tell(aggregation.copy());
                 sent++;
             }
         }
@@ -202,15 +204,15 @@ public class StageActor<D> implements LintStoneActor {
         statistix(mec).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "unknown_message", o.getClass().getSimpleName()));
     }
 
-    public record Split<D>(HopScotchData<D> hopScotchData, int sent) {
+    public record Split<D>(HopScotchDataInternal<D> hopScotchData, int sent) {
     }
 
-    public record Drop<D>(HopScotchData<D> hopScotchData) {
+    public record Drop<D>(HopScotchDataInternal<D> hopScotchData) {
     }
 
-    public record Single<D>(HopScotchData<D> hopScotchData) {
+    public record Single<D>(HopScotchDataInternal<D> hopScotchData) {
     }
 
-    public record Fragment<D>(HopScotchData<D> hopScotchData) {
+    public record Fragment<D>(HopScotchDataInternal<D> hopScotchData) {
     }
 }
