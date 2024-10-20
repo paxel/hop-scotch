@@ -1,10 +1,10 @@
 package paxel.hopscotch.impl.data;
 
 import paxel.hopscotch.api.HopScotchData;
-import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.Creator;
 import paxel.hopscotch.api.enrichment.KeyBuilder;
 import paxel.hopscotch.api.enrichment.QueryBuilder;
-import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.impl.enrichment.KeyBuilderImpl;
 
 /**

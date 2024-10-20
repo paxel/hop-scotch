@@ -1,8 +1,8 @@
 package paxel.hopscotch.impl.statistic;
 
 import paxel.hopscotch.api.Statistics;
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.Stage;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
 

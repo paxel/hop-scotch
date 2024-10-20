@@ -1,7 +1,8 @@
 package paxel.hopscotch.impl.ingress;
 
 import paxel.hopscotch.api.Config;
-import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
@@ -27,8 +28,8 @@ public class IngressActor<D> implements LintStoneActor {
     public static final String INGRESS = "Ingress";
 
     private StatisticsActor.Increment incMessage;
-    private String firstStage;
-    private BiConsumer<LintStoneMessageEventContext, Object> forwarder = (m, d) -> m.getActor(firstStage).tell(d);
+    private Stage firstStage;
+    private BiConsumer<LintStoneMessageEventContext, Object> forwarder = (m, d) -> m.getActor(firstStage.name()).tell(d);
     private final Creator creator;
 
     /**
@@ -44,8 +45,7 @@ public class IngressActor<D> implements LintStoneActor {
             // replacing the forwarder with backpressure variant if needed.
             forwarder = (m, d) -> {
                 try {
-                    m.getActor(firstStage)
-                            .tellWithBackPressure(d, backPressure);
+                    m.getActor(firstStage.name()).tellWithBackPressure(d, backPressure);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
@@ -56,7 +56,7 @@ public class IngressActor<D> implements LintStoneActor {
 
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
-        mec.inCase(String.class, (firstStageName, b) -> this.firstStage = firstStageName)
+        mec.inCase(Stage.class, (firstStage, b) -> this.firstStage = firstStage)
                 .inCase(HopScotchEnrichedData.class, this::processData)
                 .otherwise(this::unknown);
     }

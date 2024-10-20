@@ -1,4 +1,4 @@
-package paxel.hopscotch.api.enrichment;
+package paxel.hopscotch.api;
 
 /**
  * @param name Describes the Hop creating an Enrichment

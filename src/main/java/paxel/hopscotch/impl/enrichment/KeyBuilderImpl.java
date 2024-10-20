@@ -1,5 +1,7 @@
 package paxel.hopscotch.impl.enrichment;
 
+import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.api.enrichment.*;
 
 import java.util.function.Consumer;

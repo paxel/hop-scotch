@@ -1,8 +1,6 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.*;
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.Stage;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.data.HopScotchEnrichedDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
@@ -25,16 +23,15 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 public class StageActor<D> implements LintStoneActor {
     private final Creator creator;
     private final Stage stage;
-    private final Config config;
     private final int backPressure;
 
     private final List<Judge<D>> judges = new ArrayList<>();
     private final List<GateFactory<D>> gateFactories = new ArrayList<>();
-    private String nextStageName;
+    private Stage nextStage;
     private final HopMap hopMap = new HopMap();
     private final GateMap gateMap = new GateMap();
     private final DataAggregator<D> aggregator = new DataAggregator<>();
-    private LintStoneActorAccessor nextStage;
+    private LintStoneActorAccessor nextStageActor;
     private LintStoneActorAccessor statistix;
 
     /**
@@ -43,12 +40,10 @@ public class StageActor<D> implements LintStoneActor {
      * @param factories The factories of this stage
      * @param config    The config
      * @param stage     The stage
-     * @param creator   The creator
      */
-    public StageActor(List<Object> factories, Config config, Stage stage, Creator creator) {
+    public StageActor(List<Object> factories, Config config, Stage stage) {
         backPressure = config.backPressure();
-        this.config = config;
-        this.creator = creator;
+        this.creator = new Creator(stage.name());
         this.stage = stage;
         for (Object factory : factories) {
             switch (factory) {
@@ -66,7 +61,7 @@ public class StageActor<D> implements LintStoneActor {
                 .inCase(Fragment.class, this::processFragment)
                 .inCase(Split.class, this::updateFragment)
                 .inCase(Drop.class, this::dropData)
-                .inCase(String.class, (nextStageName, b) -> this.nextStageName = nextStageName)
+                .inCase(Stage.class, (ns, m) -> this.nextStage = ns)
                 .otherwise(this::unknown);
     }
 
@@ -145,10 +140,10 @@ public class StageActor<D> implements LintStoneActor {
     }
 
     private LintStoneActorAccessor nextStage(LintStoneMessageEventContext mec) {
-        if (this.nextStage != null)
-            return this.nextStage;
-        this.nextStage = mec.getActor(nextStageName);
-        return this.nextStage;
+        if (nextStageActor != null)
+            return nextStageActor;
+        nextStageActor = mec.getActor(nextStage.name());
+        return nextStageActor;
     }
 
 
@@ -191,7 +186,7 @@ public class StageActor<D> implements LintStoneActor {
             Gate<D> gate = gateFactory.createGate();
             String name = "Gate_" + stage + "_" + gateNumber + "_" + gate.getClass().getSimpleName();
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "gate", "created"));
-            return mec.registerActor(name, () -> new GateActor<>(gate, nextStageName, stage, new Creator(gate.getClass().getSimpleName() + "_" + gateNumber)), ActorSettings.DEFAULT);
+            return mec.registerActor(name, () -> new GateActor<>(gate, nextStage, stage, new Creator(gate.getClass().getSimpleName() + "_" + gateNumber)), ActorSettings.DEFAULT);
         });
     }
 
@@ -200,7 +195,7 @@ public class StageActor<D> implements LintStoneActor {
             Hop<D> hop = judgement.createHop();
             String name = "Hop." + stage + "." + hopNumber + "." + hop.getClass().getSimpleName() + "." + id.id();
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "hop", "created"));
-            return mec.registerActor(name, () -> new HopActor<>(hop, nextStageName, config, stage, new Creator(hop.getClass().getSimpleName() + "_" + hopNumber)), ActorSettings.DEFAULT);
+            return mec.registerActor(name, () -> new HopActor<>(hop, nextStage, stage, new Creator(hop.getClass().getSimpleName() + "_" + hopNumber)), ActorSettings.DEFAULT);
         });
     }
 

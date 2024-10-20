@@ -3,9 +3,9 @@ package paxel.hopscotch.impl.enrichment;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.api.enrichment.Key;
-import paxel.hopscotch.api.enrichment.Stage;
 import paxel.hopscotch.api.enrichment.ValueBuilder;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyBuilderImplTest {
 
-    public static final Stage STAGE = new Stage(1);
+    public static final Stage STAGE = new Stage(1, "Stage-1");
 
 
     public static final Creator CREATOR = new Creator("test");

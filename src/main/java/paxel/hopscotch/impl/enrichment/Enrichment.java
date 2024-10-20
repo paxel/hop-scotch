@@ -1,6 +1,6 @@
 package paxel.hopscotch.impl.enrichment;
 
-import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.Creator;
 import paxel.hopscotch.api.enrichment.Key;
 
 import java.time.Instant;

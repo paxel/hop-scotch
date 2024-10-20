@@ -1,7 +1,7 @@
 package paxel.hopscotch.impl.egress;
 
 import paxel.hopscotch.api.HopScotchData;
-import paxel.hopscotch.api.enrichment.Creator;
+import paxel.hopscotch.api.Creator;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;

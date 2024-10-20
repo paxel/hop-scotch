@@ -1,8 +1,8 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.Gate;
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.data.HopScotchEnrichedDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
@@ -18,7 +18,7 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
  */
 public class GateActor<D> implements LintStoneActor {
     private final Gate<D> gate;
-    private final String nextStageName;
+    private final Stage nextStage;
     private final Creator creator;
     private final Stage stage;
 
@@ -26,13 +26,13 @@ public class GateActor<D> implements LintStoneActor {
      * Constructs an actor
      *
      * @param gate          The gate of this actor
-     * @param nextStageName The receiver of the results
+     * @param nextStage The receiver of the results
      * @param stage         The stage this actor is part of
      * @param creator       The creator name of this gate
      */
-    public GateActor(Gate<D> gate, String nextStageName, Stage stage, Creator creator) {
+    public GateActor(Gate<D> gate, Stage nextStage, Stage stage, Creator creator) {
         this.gate = gate;
-        this.nextStageName = nextStageName;
+        this.nextStage = nextStage;
         this.creator = creator;
         this.stage = stage;
     }
@@ -49,13 +49,13 @@ public class GateActor<D> implements LintStoneActor {
         try {
             if (!gate.canPass(hopScotchEnrichedDataWrapper)) {
                 mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "dropped"));
-                mec.getActor(nextStageName).tell(new StageActor.Drop<>(hopScotchData.copy()));
+                mec.getActor(nextStage.name()).tell(new StageActor.Drop<>(hopScotchData.copy()));
             } else {
-                mec.getActor(nextStageName).tell(new StageActor.Fragment<>(hopScotchData.copy()));
+                mec.getActor(nextStage.name()).tell(new StageActor.Fragment<>(hopScotchData.copy()));
             }
         } catch (RuntimeException e) {
             mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "invalid_result", e.getClass().getSimpleName()));
-            mec.getActor(nextStageName).tell(new StageActor.Fragment<>(hopScotchData.copy()));
+            mec.getActor(nextStage.name()).tell(new StageActor.Fragment<>(hopScotchData.copy()));
         }
     }
 

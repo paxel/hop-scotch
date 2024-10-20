@@ -1,5 +1,7 @@
 package paxel.hopscotch.api.enrichment;
 
+import paxel.hopscotch.api.CreatorQueryBuilder;
+
 /**
  * The main QueryBuilder
  */

@@ -1,9 +1,8 @@
 package paxel.hopscotch.impl.stage;
 
-import paxel.hopscotch.api.Config;
+import paxel.hopscotch.api.Creator;
 import paxel.hopscotch.api.Hop;
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.api.Stage;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.data.HopScotchEnrichedDataWrapper;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
@@ -19,22 +18,21 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
  */
 public class HopActor<D> implements LintStoneActor {
     private final Hop<D> hop;
-    private final String nextStageName;
+    private final Stage nextStage;
     private final Creator creator;
     private final Stage stage;
 
     /**
      * Constructs the Actor
      *
-     * @param hop           The hop
-     * @param nextStageName The next stage
-     * @param config        The config
-     * @param stage         The stage
-     * @param creator       The creator
+     * @param hop       The hop
+     * @param nextStage The next stage
+     * @param stage     The stage
+     * @param creator   The creator
      */
-    public HopActor(Hop<D> hop, String nextStageName, Config config, Stage stage, Creator creator) {
+    public HopActor(Hop<D> hop, Stage nextStage, Stage stage, Creator creator) {
         this.hop = hop;
-        this.nextStageName = nextStageName;
+        this.nextStage = nextStage;
         this.creator = creator;
         this.stage = stage;
     }
@@ -56,11 +54,11 @@ public class HopActor<D> implements LintStoneActor {
                 // But we will add an annoying statistic because this introduces concurrency in the actor framework
                 mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "invalid_result", "modified_data"));
             }
-            mec.getActor(nextStageName).tell(new StageActor.Fragment<>(hopScotchData.copy()));
+            mec.getActor(nextStage.name()).tell(new StageActor.Fragment<>(hopScotchData.copy()));
         } catch (RuntimeException e) {
             mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "invalid_result", e.getClass().getSimpleName()));
             // we forward the input instead the output
-            mec.getActor(nextStageName).tell(new StageActor.Fragment<>(hopScotchData.copy()));
+            mec.getActor(nextStage.name()).tell(new StageActor.Fragment<>(hopScotchData.copy()));
         }
     }
 

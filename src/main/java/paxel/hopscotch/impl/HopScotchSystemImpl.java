@@ -1,11 +1,6 @@
 package paxel.hopscotch.impl;
 
-import paxel.hopscotch.api.Config;
-import paxel.hopscotch.api.HopScotchData;
-import paxel.hopscotch.api.HopScotchSystem;
-import paxel.hopscotch.api.Statistics;
-import paxel.hopscotch.api.enrichment.Creator;
-import paxel.hopscotch.api.enrichment.Stage;
+import paxel.hopscotch.api.*;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
 import paxel.hopscotch.impl.egress.ConsumerActor;
 import paxel.hopscotch.impl.egress.TerminatorActor;
@@ -70,11 +65,11 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
         String previousName = INGRESS;
         for (Map.Entry<Integer, List<Object>> integerListEntry : factories.entrySet()) {
             Integer stage = integerListEntry.getKey();
-            String name = "Stage-" + stage;
-            lintStoneSystem.registerActor(name, () -> new StageActor<>(integerListEntry.getValue(), config, new Stage(stage), new Creator(name)), ActorSettings.DEFAULT);
+            Stage currentStage = new Stage(stage, "Stage-" + stage);
+            lintStoneSystem.registerActor(currentStage.name(), () -> new StageActor<>(integerListEntry.getValue(), config, currentStage), ActorSettings.DEFAULT);
             // we tell the previous actor what the next stage is
-            lintStoneSystem.getActor(previousName).tell(name);
-            previousName = name;
+            lintStoneSystem.getActor(previousName).tell(currentStage);
+            previousName = currentStage.name();
         }
 
         lintStoneSystem.getActor(previousName).tell(TERMINATOR);
