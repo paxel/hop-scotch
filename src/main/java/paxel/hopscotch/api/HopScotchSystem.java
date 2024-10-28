@@ -30,16 +30,17 @@ public interface HopScotchSystem<D> {
     /**
      * Awaits the processing of all added data.
      *
-     * @return {@code true}
+     * @throws InterruptedException In case the Thread is interrupted while waiting
      */
-    boolean awaitFinish();
+    void awaitFinish() throws InterruptedException;
 
     /**
      * Awaits the processing of all added data or returns after the given timeout.
      *
      * @param timeout The duration to wait for the result before returning false.
      * @return {@code true} if the data was finished before the timeout
+     * @throws InterruptedException In case the process encountered an error, it is wrapped as cause in this exception
      */
-    boolean awaitFinish(Duration timeout);
+    boolean awaitFinish(Duration timeout) throws InterruptedException;
 
 }

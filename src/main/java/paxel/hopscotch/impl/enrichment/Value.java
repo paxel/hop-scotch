@@ -142,6 +142,7 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * Constructs a typesafe instance
      *
      * @param value The user generated value
+     * @param <V>   The type of the value
      */
     record ObjectValue<V>(V value) implements Value {
     }
@@ -150,6 +151,7 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * Constructs a typesafe instance
      *
      * @param value The user generated value
+     * @param <V>   The type of the value
      */
     record CollectionValue<V>(Collection<V> value) implements Value {
     }
@@ -158,6 +160,8 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * Constructs a typesafe instance
      *
      * @param value The user generated value
+     * @param <V>   The type of the value
+     * @param <K>   The key of the value
      */
     record MapValue<K, V>(Map<K, V> value) implements Value {
     }

@@ -1,7 +1,8 @@
 package paxel.hopscotch.impl.egress;
 
-import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
@@ -13,6 +14,7 @@ import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
 /**
  * An Actor that forwards all finished data to the defined consumer
+ *
  * @param <D> The data type
  */
 public class ConsumerActor<D> implements LintStoneActor {
@@ -26,7 +28,8 @@ public class ConsumerActor<D> implements LintStoneActor {
 
     /**
      * Constructs an instance of this actor
-     * @param creator The creator
+     *
+     * @param creator  The creator
      * @param consumer The given consumer or null
      */
     public ConsumerActor(Creator creator, Consumer<HopScotchData<D>> consumer) {
@@ -37,10 +40,18 @@ public class ConsumerActor<D> implements LintStoneActor {
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         // only do anything if there is a consumer
-        if (consumer != null) {
-            mec.inCase(HopScotchData.class, this::dataReceived)
-                    .otherwise(this::unknown);
-        }
+        mec.inCase(HopScotchData.class, this::dataReceived)
+                .inCase(StageActor.PoisonPill.class, this::finish)
+                .otherwise(this::unknown);
+    }
+
+    private void finish(StageActor.PoisonPill poisonPill, LintStoneMessageEventContext mec) {
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "poison_pill", StatisticsActor.RECEIVED));
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "poison_pill", StatisticsActor.SENT));
+
+        // last message to this guy. statistics is the last to go
+        mec.getActor(STATISTICS).tell(poisonPill);
+        mec.unregister();
     }
 
 

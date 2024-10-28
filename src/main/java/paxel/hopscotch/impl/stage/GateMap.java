@@ -4,6 +4,7 @@ import paxel.lintstone.api.LintStoneActorAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -22,5 +23,21 @@ public class GateMap {
      */
     public LintStoneActorAccessor computeIfAbsent(int gateNumber, Supplier<LintStoneActorAccessor> supplier) {
         return actorMap.computeIfAbsent(gateNumber, k -> supplier.get());
+    }
+
+    /**
+     * @return The number of created GateActors
+     */
+    public int size() {
+        return actorMap.size();
+    }
+
+    /**
+     * Consume all generated actors
+     *
+     * @param consumer The consumer that processes every created Actor
+     */
+    public void forEachActor(Consumer<? super LintStoneActorAccessor> consumer) {
+        actorMap.values().forEach(consumer);
     }
 }

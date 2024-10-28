@@ -86,7 +86,9 @@ WIP notes for future Paxel:
 
 * Finish Enrichment
     * Aggregation unit test 🛠️
-    * Poison pill shutdown 🛠️
+    * Statistics objects 🛠️
+    * Need a final statistics consumer for poison pill handling ✅
+    * Poison pill shutdown ✅
     * Replace String with Stage message ✅
     * KeyBuilder implementation and unit test ✅
     * Javadoc and CI working ✅

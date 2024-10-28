@@ -18,7 +18,9 @@ import static java.util.Objects.requireNonNull;
 public class HopScotchSystemBuilder<D> {
 
     private final Map<Integer, List<Object>> factories = new TreeMap<>();
-    private Consumer<HopScotchData<D>> consumer = d -> {
+    private Consumer<HopScotchData<D>> dataConsumer = d -> {
+    };
+    private Consumer<Statistics> finalStatisticConsumer = d -> {
     };
     private int backPressure;
 
@@ -82,11 +84,23 @@ public class HopScotchSystemBuilder<D> {
     /**
      * Sets a consumer that receives all finished data
      *
-     * @param consumer The receiver of all the finished data
+     * @param dataConsumer The receiver of all the finished data
      * @return the builder itself
      */
-    public HopScotchSystemBuilder<D> setConsumer(Consumer<HopScotchData<D>> consumer) {
-        this.consumer = requireNonNull(consumer);
+    public HopScotchSystemBuilder<D> setDataConsumer(Consumer<HopScotchData<D>> dataConsumer) {
+        this.dataConsumer = requireNonNull(dataConsumer);
+        return this;
+    }
+
+
+    /**
+     * Sets a consumer that receives the final statistix.
+     *
+     * @param finalStatisticConsumer The receiver of the final statistics
+     * @return the builder itself
+     */
+    public HopScotchSystemBuilder<D> setFinalStatisticConsumer(Consumer<Statistics> finalStatisticConsumer) {
+        this.finalStatisticConsumer = requireNonNull(finalStatisticConsumer);
         return this;
     }
 
@@ -103,7 +117,7 @@ public class HopScotchSystemBuilder<D> {
         Config config = new Config(backPressure);
 
         HopScotchSystemImpl<D> hopScotchSystem = new HopScotchSystemImpl<>(config);
-        hopScotchSystem.start(factories, consumer);
+        hopScotchSystem.start(factories, dataConsumer, finalStatisticConsumer);
         return hopScotchSystem;
     }
 }

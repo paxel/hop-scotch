@@ -15,7 +15,9 @@ import paxel.lintstone.api.LintStoneSystemFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static paxel.hopscotch.impl.egress.ConsumerActor.CONSUMER;
@@ -34,6 +36,7 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
     private final Config config;
     private LintStoneSystem lintStoneSystem;
     private LintStoneActorAccessor ingress;
+    private final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
     /**
      * Constructs an instance.
@@ -47,16 +50,17 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
     /**
      * Creates a {@link LintStoneSystem} and adds all required Actors and starts the system.
      *
-     * @param factories The JudgeFactories and GateFactories
-     * @param consumer  The receiver for the finished data. Can be null
+     * @param factories              The JudgeFactories and GateFactories
+     * @param consumer               The receiver for the finished data. Can be null
+     * @param finalStatisticConsumer The receiver of the final statistics
      */
-    public void start(Map<Integer, List<Object>> factories, Consumer<HopScotchData<D>> consumer) {
+    public void start(Map<Integer, List<Object>> factories, Consumer<HopScotchData<D>> consumer, Consumer<Statistics> finalStatisticConsumer) {
         if (factories.isEmpty())
             throw new IllegalArgumentException("factories cannot be empty");
         lintStoneSystem = LintStoneSystemFactory.create();
 
         // Collects statistics from all Actors and provides them on demand
-        lintStoneSystem.registerActor(STATISTICS, StatisticsActor::new, ActorSettings.DEFAULT);
+        lintStoneSystem.registerActor(STATISTICS, () -> new StatisticsActor(finalStatisticConsumer.andThen(a -> this.shutdownLatch.countDown())), ActorSettings.DEFAULT);
         // Responsible to add all finished Data to the Consumer
         lintStoneSystem.registerActor(CONSUMER, () -> new ConsumerActor<>(new Creator(CONSUMER), consumer), ActorSettings.DEFAULT);
 
@@ -72,8 +76,8 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
             previousName = currentStage.name();
         }
 
-        lintStoneSystem.getActor(previousName).tell(TERMINATOR);
         lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor<>(new Creator(TERMINATOR)), ActorSettings.DEFAULT);
+        lintStoneSystem.getActor(previousName).tell(new Stage(Integer.MAX_VALUE, TERMINATOR));
 
     }
 
@@ -90,14 +94,20 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
     }
 
     @Override
-    public boolean awaitFinish() {
-        // TODO: poison pill and await finish
-        return false;
+    public void awaitFinish() throws InterruptedException {
+        lintStoneSystem.getActor(INGRESS).tell(new StageActor.PoisonPill(1));
+        this.shutdownLatch.await();
+        lintStoneSystem.shutDownNow();
     }
 
     @Override
-    public boolean awaitFinish(Duration timeout) {
-        // TODO: poison pill and await finish
-        return false;
+    public boolean awaitFinish(Duration timeout) throws InterruptedException {
+        LintStoneActorAccessor actor = lintStoneSystem.getActor(INGRESS);
+        if (actor.exists())
+            actor.tell(new StageActor.PoisonPill(1));
+        boolean await = this.shutdownLatch.await(Math.max(1, timeout.getSeconds()), TimeUnit.SECONDS);
+        if (await)
+            lintStoneSystem.shutDownNow();
+        return await;
     }
 }

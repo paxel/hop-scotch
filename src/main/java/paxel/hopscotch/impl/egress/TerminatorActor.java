@@ -1,7 +1,8 @@
 package paxel.hopscotch.impl.egress;
 
-import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.Creator;
+import paxel.hopscotch.api.HopScotchData;
+import paxel.hopscotch.impl.stage.StageActor;
 import paxel.hopscotch.impl.statistic.StatisticsActor;
 import paxel.lintstone.api.LintStoneActor;
 import paxel.lintstone.api.LintStoneMessageEventContext;
@@ -37,7 +38,15 @@ public class TerminatorActor<D> implements LintStoneActor {
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         mec.inCase(HopScotchData.class, this::processData)
+                .inCase(StageActor.PoisonPill.class, this::finish)
                 .otherwise(this::unknown);
+    }
+
+    private void finish(StageActor.PoisonPill poisonPill, LintStoneMessageEventContext mec) {
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "poison_pill", StatisticsActor.RECEIVED));
+        mec.getActor(CONSUMER).tell(poisonPill);
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, null, creator, mec.getName(), "poison_pill", StatisticsActor.SENT));
+        mec.unregister();
     }
 
 

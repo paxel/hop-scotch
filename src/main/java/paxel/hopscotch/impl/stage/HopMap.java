@@ -5,6 +5,7 @@ import paxel.lintstone.api.LintStoneActorAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -25,5 +26,23 @@ public class HopMap {
     public LintStoneActorAccessor computeIfAbsent(int judgeNumber, HopId id, Supplier<LintStoneActorAccessor> supplier) {
         return actorMap.computeIfAbsent(judgeNumber, j -> new HashMap<>())
                 .computeIfAbsent(id, h -> supplier.get());
+    }
+
+    /**
+     * @return The number of created HopActors
+     */
+    public int size() {
+        return actorMap.size();
+    }
+
+    /**
+     * Consume all generateo actors
+     *
+     * @param consumer The consumer that processes every created Actor
+     */
+    public void forEachActor(Consumer<? super LintStoneActorAccessor> consumer) {
+        actorMap.values().stream()
+                .flatMap(e -> e.values().stream())
+                .forEach(consumer);
     }
 }

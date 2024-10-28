@@ -58,11 +58,15 @@ public class IngressActor<D> implements LintStoneActor {
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         mec.inCase(Stage.class, (firstStage, b) -> this.firstStage = firstStage)
                 .inCase(HopScotchEnrichedData.class, this::processData)
+                .inCase(StageActor.PoisonPill.class, this::finish)
                 .otherwise(this::unknown);
     }
 
-    private void ignore(String s, LintStoneMessageEventContext lintStoneMessageEventContext) {
-        // The first stage sends us its name. We know it already
+    private void finish(StageActor.PoisonPill poisonPill, LintStoneMessageEventContext mec) {
+        // tell the first stage to die
+        mec.getActor(firstStage.name()).tell(poisonPill);
+        // we end ourselves immediately
+        mec.unregister();
     }
 
     private void processData(HopScotchEnrichedData<D> hopScotchData, LintStoneMessageEventContext mec) {

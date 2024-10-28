@@ -40,7 +40,15 @@ public class GateActor<D> implements LintStoneActor {
     @Override
     public void newMessageEvent(LintStoneMessageEventContext mec) {
         mec.inCase(HopScotchEnrichedData.class, this::processData)
+                .inCase(StageActor.PoisonPill.class,this::finish)
                 .otherwise(this::unknown);
+    }
+
+    private void finish(StageActor.PoisonPill poisonPill, LintStoneMessageEventContext mec) {
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "poison_pill", StatisticsActor.RECEIVED));
+        mec.getActor(nextStage.name()).tell(poisonPill);
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "poison_pill", StatisticsActor.SENT));
+        mec.unregister();
     }
 
     private void processData(HopScotchEnrichedData<D> hopScotchData, LintStoneMessageEventContext mec) {

@@ -12,6 +12,7 @@ import paxel.lintstone.api.LintStoneMessageEventContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static paxel.hopscotch.impl.statistic.StatisticsActor.STATISTICS;
 
@@ -33,6 +34,7 @@ public class StageActor<D> implements LintStoneActor {
     private final DataAggregator<D> aggregator = new DataAggregator<>();
     private LintStoneActorAccessor nextStageActor;
     private LintStoneActorAccessor statistix;
+    private final AtomicInteger poisonPillsReceived = new AtomicInteger();
 
     /**
      * Constructs an Actor.
@@ -62,7 +64,26 @@ public class StageActor<D> implements LintStoneActor {
                 .inCase(Split.class, this::updateFragment)
                 .inCase(Drop.class, this::dropData)
                 .inCase(Stage.class, (ns, m) -> this.nextStage = ns)
+                .inCase(StageActor.PoisonPill.class, this::finish)
                 .otherwise(this::unknown);
+    }
+
+    private void finish(PoisonPill receivedPoisonPill, LintStoneMessageEventContext mec) {
+        mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(1L, stage, creator, mec.getName(), "poison_pill", StatisticsActor.RECEIVED));
+        if (receivedPoisonPill.count() == this.poisonPillsReceived.incrementAndGet()) {
+            // count gates and hops +1 for next stage
+            int count = hopMap.size() + gateMap.size() + 1;
+            PoisonPill forWardPoisonPill = new PoisonPill(count);
+
+            // send it to everyone
+            hopMap.forEachActor(a -> a.tell(forWardPoisonPill));
+            gateMap.forEachActor(a -> a.tell(forWardPoisonPill));
+            nextStage(mec).tell(forWardPoisonPill);
+            mec.getActor(STATISTICS).tell(new StatisticsActor.Increment(count, stage, creator, mec.getName(), "poison_pill", StatisticsActor.RECEIVED));
+
+            // we're done
+            mec.unregister();
+        }
     }
 
     private void dropData(Drop<D> drop, LintStoneMessageEventContext mec) {
@@ -239,5 +260,13 @@ public class StageActor<D> implements LintStoneActor {
      * @param <D>           The data type
      */
     public record Fragment<D>(HopScotchEnrichedData<D> hopScotchData) {
+    }
+
+    /**
+     * A message for collapsing the pipeline front to end. Making sure all messages have been processed.
+     *
+     * @param count The number of poison pills to receive, including this
+     */
+    public record PoisonPill(int count) {
     }
 }
