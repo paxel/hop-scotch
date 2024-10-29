@@ -24,43 +24,32 @@ to change the parameters you feed to the hop scotch and run it again, without ch
 # An example
 
 We have 3 stages.
-The Data are sentences.
+The Data are random files.
 
 **Stage 1**
 
-**Hop 1 - Language detector**
+**Hop - Image detector**
 
 Predicate: all<br/>
-Enriches the sentence with the "language" of the text (e.g., French)
+If the file is an image of a known type, the Image detector adds an enrichment
+
+image.type=\[PNG|JPEG|GIF]
 
 **Stage 2**
 
-**Hop 1: French translator**
+**Gate: Image gate**
 
-Predicate: language: French<br/>
-Enriches the sentence with an english translation of the French original
-
-**Hop 2: German translator**
-
-Predicate: language: german<br/>
-Enriches the sentence with an english translation of the german original
+Predicate: all<br/>
+Checks if the image.type is set, otherwise drops it
 
 **Stage 3**
 
-**Hop 1: PDF Builder (original)**
+**Hop 1: Image Uploader**
 
-Predicate: all<br/>
-Aggregate all original sentences into a PDF
+Predicate: language: all<br/>
 
-**Hop 2: PDF Builder (translated)**
+Uploads all files to a gallery
 
-Predicate: translation exists<br/>
-Aggregate all translated sentences into a PDF
-
-If you add more Hops in stage 2, you automatically support more languages (if the detector can detect them)
-And if you replace the PDF builders with just a French one, you will only have the French PDF.
-Additionally, if you insert a translator from English to French between stage 2 and 3, you will have all texts in French
-as PDF.
 
 # Types of Hops
 
