@@ -26,4 +26,33 @@ public interface Judgment<D> {
      * @return The new hop
      */
     Hop<D> createHop();
+
+
+    /**
+     * Creates a simple Judgment.
+     *
+     * @param accepted if the Judge accepted the data.
+     * @param hop      The Hop to use.
+     * @param hopId    The hop ID
+     * @param <T>      The type of the data
+     * @return a new Judgment
+     */
+    static <T> Judgment<T> create(boolean accepted, Hop<T> hop, HopId hopId) {
+        return new Judgment<T>() {
+            @Override
+            public boolean isAccepted() {
+                return accepted;
+            }
+
+            @Override
+            public HopId getId() {
+                return hopId;
+            }
+
+            @Override
+            public Hop<T> createHop() {
+                return hop;
+            }
+        };
+    }
 }
