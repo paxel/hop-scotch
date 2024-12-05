@@ -37,8 +37,13 @@ public class StatisticsActor implements LintStoneActor {
     /**
      * A message for requesting data
      */
-    public static final Request REQUEST = new Request("Statistics");
+    public static final Request REQUEST = new Request();
+    private static final String INCREMENT = "increment";
+    private static final String POISON_PILL = "poison-pill";
+    private static final String UNKNOWN = "unknown";
+    private static final String REQUEST_MESSAGE = "request-message";
     private final Consumer<Statistics> finalStatisticConsumer;
+    private final MutableStatistic statistic = new MutableStatistic();
 
     /**
      * Constructs the actor
@@ -58,41 +63,35 @@ public class StatisticsActor implements LintStoneActor {
                 .otherwise(this::unknown);
     }
 
-    private void increment(Increment increment, LintStoneMessageEventContext lintStoneMessageEventContext) {
-        // TODO: counter
+    private void increment(Increment increment, LintStoneMessageEventContext mec) {
+        statistic.increment(1, mec.getName(), RECEIVED, INCREMENT);
+        statistic.increment(increment.value, increment.path);
     }
 
     private void finish(StageActor.PoisonPill poisonPill, LintStoneMessageEventContext mec) {
-        // TODO: counter
+        statistic.increment(1, mec.getName(), RECEIVED, POISON_PILL);
         finalStatisticConsumer.accept(createStatistics());
         mec.unregister();
     }
 
     private void unknown(Object o, LintStoneMessageEventContext mec) {
-        // TODO: errorcounter
+        statistic.increment(1, mec.getName(), RECEIVED, UNKNOWN);
     }
 
 
-    private void requestReceived(Request request, LintStoneMessageEventContext lintStoneMessageEventContext) {
-        // TODO: counter
-        lintStoneMessageEventContext.reply(createStatistics());
+    private void requestReceived(Request request, LintStoneMessageEventContext mec) {
+        statistic.increment(1, mec.getName(), RECEIVED, REQUEST_MESSAGE);
+        mec.reply(createStatistics());
     }
 
     private Statistics createStatistics() {
-        return new Statistics() {
-            @Override
-            public int hashCode() {
-                return super.hashCode();
-            }
-        };
+        return statistic.snapshot();
     }
 
     /**
      * The Request message
-     *
-     * @param request The request
      */
-    public record Request(String request) {
+    public record Request() {
     }
 
     /**

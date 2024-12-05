@@ -2,10 +2,12 @@ package paxel.hopscotch.impl.statistic;
 
 import paxel.hopscotch.api.Statistics;
 
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 /**
  * Represents the Statistics of the whole system
@@ -37,5 +39,20 @@ public class MutableStatistic implements Statistics {
 
     Statistics snapshot() {
         return new ImmutableStatistic(map);
+    }
+
+    @Override
+    public Set<String> getKeys() {
+        return map.keySet();
+    }
+
+    @Override
+    public Long get(String key) {
+        return map.get(key).get();
+    }
+
+    @Override
+    public Stream<NamedValue> stream() {
+        return map.entrySet().stream().map(e -> new NamedValue(e.getKey(), e.getValue().get()));
     }
 }
