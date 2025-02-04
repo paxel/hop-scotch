@@ -50,7 +50,6 @@ Predicate: language: all<br/>
 
 Uploads all files to a gallery
 
-
 # Types of Hops
 
 To create this hop-scotch, you can implement Two types of Hops:
@@ -73,19 +72,6 @@ If there are multiple gates on a stage, the next stage will drop the data if any
 
 WIP notes for future Paxel:
 
-- [ ] Finish Enrichment
-    - [ ] Aggregation unit test
-    - [ ] Statistics objects
-    - [x] Need a final statistics consumer for poison pill handling 
-    - [x] Poison pill shutdown 
-    - [x] Replace String with Stage message 
-    - [x] KeyBuilder implementation and unit test 
-    - [x] Javadoc and CI working 
-    - [x] Implement Aggregation 
-    - [x] Implement Merge Method for Aggregation 
-    - [x] Implement Copy Method to create a dedicated HopData instance for all Actors 
-    - [x] Add Creator and Stage to all Hops and Gates 
-    - [x] Add backpressure to all StageActors 
 - [ ] Implement Key Query
 - [ ] Implement Creator Query
 - [ ] Implement Stage Query
@@ -93,3 +79,16 @@ WIP notes for future Paxel:
     - [ ] All Queries can provide a set of their values (e.g. keys) that is filtered by the previous Queries 🛠️
     - [ ] All Queries filter the result 🛠️
     - [ ] All Queries filter for type (e.g Integer) 🛠️
+- [x] Finish Enrichment
+  - [x] Aggregation unit test
+  - [x] Statistics objects
+  - [x] Need a final statistics consumer for poison pill handling
+  - [x] Poison pill shutdown
+  - [x] Replace String with Stage message
+  - [x] KeyBuilder implementation and unit test
+  - [x] Javadoc and CI working
+  - [x] Implement Aggregation
+  - [x] Implement Merge Method for Aggregation
+  - [x] Implement Copy Method to create a dedicated HopData instance for all Actors
+  - [x] Add Creator and Stage to all Hops and Gates
+  - [x] Add backpressure to all StageActors

@@ -1,8 +1,8 @@
 package paxel.hopscotch.impl.stage;
 
 import paxel.hopscotch.api.enrichment.Key;
-import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
 import paxel.hopscotch.impl.data.HopScotchEnrichedData;
+import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,16 +29,16 @@ public class DataAggregator<D> {
      * <br>
      * If the last message for the data is received, all information about this data is deleted.
      *
-     * @param hopScotchData     The data
+     * @param id the ID of the Aggregation. All HopScotchData of the fragments have the same one
      * @param expectedFragments The number of fragments expected
      * @return the aggregated result or empty
      */
-    public Optional<HopScotchEnrichedData<D>> update(HopScotchEnrichedData<D> hopScotchData, int expectedFragments) {
-        AtomicInteger atomicInteger = received.get(hopScotchData.getId());
+    public Optional<HopScotchEnrichedData<D>> setFragmentCount(UUID id, int expectedFragments) {
+        AtomicInteger atomicInteger = received.get(id);
         if (atomicInteger != null && atomicInteger.get() == expectedFragments) {
-            return cleanRemoval(hopScotchData.getId());
+            return cleanRemoval(id);
         }
-        expected.putIfAbsent(hopScotchData.getId(), expectedFragments);
+        expected.putIfAbsent(id, expectedFragments);
         return Optional.empty();
     }
 
@@ -51,11 +51,12 @@ public class DataAggregator<D> {
      * <br>
      * If the last message for the data is received, all information about this data is deleted.
      *
+     * @param id The id of the aggregation. It should be the same as in the fragment
      * @param fragment A fragment
      * @return the aggregated result or empty
      */
-    public Optional<HopScotchEnrichedData<D>> add(HopScotchEnrichedData<D> fragment) {
-        aggregation.compute(fragment.getId(), (k, old) -> {
+    public Optional<HopScotchEnrichedData<D>> add(UUID id, HopScotchEnrichedData<D> fragment) {
+        aggregation.compute(id, (k, old) -> {
             if (old == null) {
                 // The first received fragment becomes the aggregation seed
                 return fragment;
@@ -64,14 +65,14 @@ public class DataAggregator<D> {
             return new HopScotchEnrichedData<>(old.getData(), mergeEnrichments(old.getEnrichments(), fragment.getEnrichments()), old.getId());
         });
 
-        int fragmentsReceived = received.computeIfAbsent(fragment.getId(), k -> new AtomicInteger()).incrementAndGet();
-        if (fragmentsReceived < expected.getOrDefault(fragment.getId(), 0)) {
+        int fragmentsReceived = received.computeIfAbsent(id, k -> new AtomicInteger()).incrementAndGet();
+        if (fragmentsReceived < expected.getOrDefault(id, 0)) {
             // We have both received the fragment count or not enough fragments
             return Optional.empty();
         }
 
         // We have enough fragments
-        return cleanRemoval(fragment.getId());
+        return cleanRemoval(id);
     }
 
 

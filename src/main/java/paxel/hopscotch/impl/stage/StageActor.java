@@ -117,7 +117,7 @@ public class StageActor<D> implements LintStoneActor {
      * @param mec   The context
      */
     private void updateFragment(Split<D> split, LintStoneMessageEventContext mec) {
-        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.update(split.hopScotchData(), split.expectedFragments());
+        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.setFragmentCount(split.hopScotchData().getId(), split.expectedFragments());
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_split"));
             processCompleteData(aggregation.get(), mec);
@@ -126,7 +126,8 @@ public class StageActor<D> implements LintStoneActor {
 
     private void processFragment(Fragment<D> fragment, LintStoneMessageEventContext mec) {
         statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "fragment", StatisticsActor.PROCESSED));
-        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.add(fragment.hopScotchData());
+        HopScotchEnrichedData<D> data = fragment.hopScotchData();
+        Optional<HopScotchEnrichedData<D>> aggregation = aggregator.add(data.getId(), data);
 
         if (aggregation.isPresent()) {
             statistix(mec).tell(new StatisticsActor.Increment(1, stage, creator, mec.getName(), "aggregation", "by_fragment"));
