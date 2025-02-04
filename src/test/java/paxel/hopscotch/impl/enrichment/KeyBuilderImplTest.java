@@ -9,7 +9,6 @@ import paxel.hopscotch.api.enrichment.Key;
 import paxel.hopscotch.api.enrichment.ValueBuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

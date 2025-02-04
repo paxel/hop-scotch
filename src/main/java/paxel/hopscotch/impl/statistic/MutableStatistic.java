@@ -25,8 +25,8 @@ public class MutableStatistic implements Statistics {
 
     private final SortedMap<String, AtomicLong> map = new TreeMap<>();
 
-    long increment(long value, String... field) {
-        return map.computeIfAbsent(toKey(field), k -> new AtomicLong()).addAndGet(value);
+    void increment(long value, String... field) {
+        map.computeIfAbsent(toKey(field), k -> new AtomicLong()).addAndGet(value);
     }
 
     void set(long value, String... field) {

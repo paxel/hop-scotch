@@ -66,19 +66,24 @@ public class HopScotchSystemImpl<D> implements HopScotchSystem<D> {
 
         ingress = lintStoneSystem.registerActor(INGRESS, () -> new IngressActor<>(new Creator(INGRESS), config), ActorSettings.DEFAULT);
 
-        String previousName = INGRESS;
-        for (Map.Entry<Integer, List<Object>> integerListEntry : factories.entrySet()) {
-            Integer stage = integerListEntry.getKey();
-            Stage currentStage = new Stage(stage, "Stage-" + stage);
-            lintStoneSystem.registerActor(currentStage.name(), () -> new StageActor<>(integerListEntry.getValue(), config, currentStage), ActorSettings.DEFAULT);
-            // we tell the previous actor what the next stage is
-            lintStoneSystem.getActor(previousName).tell(currentStage);
-            previousName = currentStage.name();
-        }
+        String lastStageName = chainStages(factories);
 
         lintStoneSystem.registerActor(TERMINATOR, () -> new TerminatorActor<>(new Creator(TERMINATOR)), ActorSettings.DEFAULT);
-        lintStoneSystem.getActor(previousName).tell(new Stage(Integer.MAX_VALUE, TERMINATOR));
+        lintStoneSystem.getActor(lastStageName).tell(new Stage(Integer.MAX_VALUE, TERMINATOR));
 
+    }
+
+    private String chainStages(Map<Integer, List<Object>> factories) {
+        String predecessorStageName = INGRESS;
+        for (Map.Entry<Integer, List<Object>> factory : factories.entrySet()) {
+            Integer stage = factory.getKey();
+            Stage currentStage = new Stage(stage, "Stage-" + stage);
+            lintStoneSystem.registerActor(currentStage.name(), () -> new StageActor<>(factory.getValue(), config, currentStage), ActorSettings.DEFAULT);
+            // we tell the previous actor what the next stage is
+            lintStoneSystem.getActor(predecessorStageName).tell(currentStage);
+            predecessorStageName = currentStage.name();
+        }
+        return predecessorStageName;
     }
 
     @Override
