@@ -9,6 +9,7 @@ import paxel.hopscotch.api.enrichment.Key;
 import paxel.hopscotch.api.enrichment.ValueBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -107,6 +108,10 @@ class KeyBuilderImplTest {
     void wrongKey() {
         KeyBuilderImpl classUnderTest = new KeyBuilderImpl(values::add, STAGE, CREATOR);
         Assertions.assertThatThrownBy(() -> classUnderTest.forKey(new Key() {
+            @Override
+            public Collection<String> asCollection() {
+                return List.of();
+            }
         })).hasMessage("Unknown key type class paxel.hopscotch.impl.enrichment.KeyBuilderImplTest$1");
     }
 }

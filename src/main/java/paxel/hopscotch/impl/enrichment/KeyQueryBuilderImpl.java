@@ -1,0 +1,106 @@
+package paxel.hopscotch.impl.enrichment;
+
+import paxel.hopscotch.api.enrichment.Key;
+import paxel.hopscotch.api.enrichment.KeyQueryBuilder;
+import paxel.hopscotch.api.enrichment.QueryBuilder;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ *
+ */
+public class KeyQueryBuilderImpl implements KeyQueryBuilder {
+
+
+    private final List<EnrichmentImpl> enrichments;
+
+    /**
+     * Constructs a {@link KeyQueryBuilder} for given {@link EnrichmentImpl}s
+     *
+     * @param enrichments the remaining enrichments
+     */
+    public KeyQueryBuilderImpl(List<EnrichmentImpl> enrichments) {
+        this.enrichments = List.copyOf(enrichments);
+    }
+
+    @Override
+    public KeyQueryBuilder matchExact(String key) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> enrichment.key().equals(KeyFactory.forString(key))).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder matchExact(Key key) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> enrichment.key().equals(key)).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder matchExact(String... path) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> enrichment.key().equals(KeyFactory.path(path))).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder matchExact(Collection<String> path) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> enrichment.key().equals(KeyFactory.collection(path))).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder containsAll(String... subPaths) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> {
+            for (String subPath : subPaths) {
+                if (!enrichment.key().asCollection().contains(subPath)) {
+                    return false;
+                }
+            }
+            return true;
+        }).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder containsAny(String... subPaths) {
+        return new KeyQueryBuilderImpl(filter(enrichment -> {
+            for (String subPath : subPaths) {
+                if (!enrichment.key().asCollection().contains(subPath)) {
+                    return true;
+                }
+            }
+            return false;
+        }).toList());
+    }
+
+    @Override
+    public KeyQueryBuilder containsInOrder(String... subPaths) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public KeyQueryBuilder matchRegex(String regex) {
+        return new KeyQueryBuilderImpl(filterRegex(Pattern.compile(regex)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Stream<EnrichmentImpl> stream() {
+        return enrichments.stream();
+    }
+
+    @Override
+    public QueryBuilder query() {
+        return new QueryBuilderImpl(enrichments);
+    }
+
+
+    private Stream<EnrichmentImpl> filterRegex(Pattern pattern) {
+        return filter(enrichment -> pattern.matcher(enrichment.key().toString()).matches());
+    }
+
+
+    private Stream<EnrichmentImpl> filter(Predicate<EnrichmentImpl> predicate) {
+        return stream().filter(predicate);
+    }
+
+
+}

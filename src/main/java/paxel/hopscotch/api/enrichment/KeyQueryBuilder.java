@@ -1,52 +1,114 @@
 package paxel.hopscotch.api.enrichment;
 
+import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
+
 import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * The Query-builder for querying or filtering for keys.
  */
 public interface KeyQueryBuilder {
 
-    /**
-     * Retrieves all currently added keys.
-     *
-     * @return a Set of keys.
-     */
-    Set<Key> all();
 
     /**
-     * Retrieve the key that matches exact or empty if not available.
+     * Create a new KeyQueryBuilder that has only the entities with the given key
      *
      * @param key The key value
-     * @return The key or empty
+     * @return the KeyQueryBuilder for the filtered enrichments
      */
-    Optional<Key> exact(String key);
-
+    KeyQueryBuilder matchExact(String key);
 
     /**
-     * Retrieve the key that matches exact or empty if not available.
+     * Create a new KeyQueryBuilder that has only the entities with the given key
+     *
+     * @param key The key value
+     * @return the KeyQueryBuilder for the filtered enrichments
+     */
+    KeyQueryBuilder matchExact(Key key);
+
+    /**
+     * Create a new KeyQueryBuilder that has only the entities with the given path
      *
      * @param path The path value
-     * @return The key or empty
+     * @return the KeyQueryBuilder for the filtered enrichments
      */
-    Optional<Key> exact(String... path);
+    KeyQueryBuilder matchExact(String... path);
 
     /**
-     * Retrieve the key that matches exact or empty if not available.
+     * Create a new KeyQueryBuilder that has only the entities with the given path
      *
      * @param path The path value
-     * @return The key or empty
+     * @return the KeyQueryBuilder for the filtered enrichments
      */
-    Optional<Key> exact(Collection<String> path);
+    KeyQueryBuilder matchExact(Collection<String> path);
 
     /**
-     * Retrieve the keys that match the given regex
+     * Create a new KeyQueryBuilder that has as Source all enrichments with keys that contain every of the given sub paths.
+     * <br>
+     * <br>
+     * given subPaths foo,bar<br>
+     * path: alpha.bar.foo.beta - matches<br>
+     * path: alpha.bard.foo.beta - doesn't match (bard != bar)<br>
      *
-     * @param regex The path value
-     * @return The keys or empty set
+     * @param subPaths The required sub paths
+     * @return the KeyQueryBuilder for the filtered enrichments
      */
-    Set<Key> regex(String regex);
+    KeyQueryBuilder containsAll(String... subPaths);
 
+    /**
+     * Create a new KeyQueryBuilder that has as Source all enrichments with keys that contain any of the given sub paths.
+     * <br>
+     * <br>
+     * given subPaths foo,bar<br>
+     * path: alpha.bar.beta - matches bar<br>
+     * path: alpha.bard.beta - doesn't match bar nor foo (bard != bar)<br>
+     *
+     * @param subPaths The required sub paths
+     * @return the KeyQueryBuilder for the filtered enrichments
+     */
+    KeyQueryBuilder containsAny(String... subPaths);
+
+    /**
+     * Create a new KeyQueryBuilder that has as Source all enrichments with keys that contain all the given sub paths in the given order without a gap.
+     * <br>
+     * <br>
+     * given subPaths foo,bar<br>
+     * path: alpha.foo.bar.beta - matches<br>
+     * path: alpha.foo.and.bar.beta - doesn't match (and is between foo and bar)<br>
+     * path: alpha.foo.bard.beta - doesn't match (bard != bar)<br>
+     *
+     * @param subPaths The required sub paths
+     * @return the KeyQueryBuilder for the filtered enrichments
+     */
+    KeyQueryBuilder containsInOrder(String... subPaths);
+
+
+    /**
+     * Create a new KeyQueryBuilder that has as Source the result of the given regex match on keys.
+     * <br>
+     * <br>
+     * given regex bar<br>
+     * path: alpha.foo.bar.beta - matches<br>
+     * path: alpha.foo.bard.beta - matches<br>
+     *
+     * @param regex The regex to filter on the key
+     * @return the KeyQueryBuilder for the filtered enrichments
+     */
+    KeyQueryBuilder matchRegex(String regex);
+
+
+    /**
+     * Get the enrichments as a Stream. Can be used to access the remaining keys
+     *
+     * @return an unfiltered stream of enrichments
+     */
+    Stream<EnrichmentImpl> stream();
+
+    /**
+     * Get a QueryBuilder for the remaining enrichments.
+     *
+     * @return a new QueryBuilder that only works on the remaining Enrichments.
+     */
+    QueryBuilder query();
 }

@@ -4,7 +4,6 @@ import paxel.hopscotch.api.enrichment.Key;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @param key The user defined key for enrichment
@@ -12,6 +11,11 @@ import java.util.stream.Collectors;
 public record KeyImpl(Collection<String> key) implements Key {
 
     public String toString() {
-        return key.stream().collect(Collectors.joining("."));
+        return String.join(".", key);
+    }
+
+    @Override
+    public Collection<String> asCollection() {
+        return List.copyOf(key);
     }
 }

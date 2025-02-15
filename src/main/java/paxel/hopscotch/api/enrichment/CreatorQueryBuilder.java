@@ -1,4 +1,4 @@
-package paxel.hopscotch.api;
+package paxel.hopscotch.api.enrichment;
 
 /**
  * The Query-builder for querying or filtering for creators.
