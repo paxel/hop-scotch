@@ -99,16 +99,30 @@ public interface KeyQueryBuilder {
 
 
     /**
-     * Get the enrichments as a Stream. Can be used to access the remaining keys
+     * Get the enrichments as a Stream.
      *
-     * @return an unfiltered stream of enrichments
+     * @return a stream of enrichments
      */
     Stream<EnrichmentImpl> stream();
 
     /**
-     * Get a QueryBuilder for the remaining enrichments.
-     *
-     * @return a new QueryBuilder that only works on the remaining Enrichments.
+     * Create a {@link StageQueryBuilder} for the filtered Enrichments
+     * @return a new queryBuilder
      */
-    QueryBuilder query();
+    StageQueryBuilder queryStage();
+
+    /**
+     * Create a {@link ValueQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    ValueQueryBuilder queryValue();
+
+    /**
+     * Create a {@link CreatorQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    CreatorQueryBuilder queryCreator();
+
 }

@@ -1,8 +1,6 @@
 package paxel.hopscotch.impl.enrichment;
 
-import paxel.hopscotch.api.enrichment.Key;
-import paxel.hopscotch.api.enrichment.KeyQueryBuilder;
-import paxel.hopscotch.api.enrichment.QueryBuilder;
+import paxel.hopscotch.api.enrichment.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -87,12 +85,6 @@ public class KeyQueryBuilderImpl implements KeyQueryBuilder {
         return enrichments.stream();
     }
 
-    @Override
-    public QueryBuilder query() {
-        return new QueryBuilderImpl(enrichments);
-    }
-
-
     private Stream<EnrichmentImpl> filterRegex(Pattern pattern) {
         return filter(enrichment -> pattern.matcher(enrichment.key().toString()).matches());
     }
@@ -102,5 +94,21 @@ public class KeyQueryBuilderImpl implements KeyQueryBuilder {
         return stream().filter(predicate);
     }
 
+
+    @Override
+    public StageQueryBuilder queryStage() {
+        return new StageQueryBuilderImpl(enrichments);
+    }
+
+    @Override
+    public ValueQueryBuilder queryValue() {
+        return new ValueQueryBuilderImpl(enrichments);
+    }
+
+    @Override
+    public CreatorQueryBuilder queryCreator() {
+        return new CreatorQueryBuilderImpl(enrichments);
+
+    }
 
 }

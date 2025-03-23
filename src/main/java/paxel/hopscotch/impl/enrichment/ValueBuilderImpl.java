@@ -2,6 +2,7 @@ package paxel.hopscotch.impl.enrichment;
 
 import paxel.hopscotch.api.Creator;
 import paxel.hopscotch.api.Stage;
+import paxel.hopscotch.api.enrichment.Value;
 import paxel.hopscotch.api.enrichment.ValueBuilder;
 
 import java.math.BigDecimal;

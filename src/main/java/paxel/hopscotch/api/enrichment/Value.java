@@ -1,4 +1,4 @@
-package paxel.hopscotch.impl.enrichment;
+package paxel.hopscotch.api.enrichment;
 
 
 import java.math.BigDecimal;
@@ -137,6 +137,8 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      */
     record BigIntegerValue(BigInteger value) implements Value {
     }
+
+    // TODO: Date!
 
     /**
      * Constructs a typesafe instance

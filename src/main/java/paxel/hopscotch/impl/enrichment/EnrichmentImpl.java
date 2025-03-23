@@ -1,8 +1,9 @@
 package paxel.hopscotch.impl.enrichment;
 
 import paxel.hopscotch.api.Creator;
-import paxel.hopscotch.api.enrichment.Key;
 import paxel.hopscotch.api.Stage;
+import paxel.hopscotch.api.enrichment.Key;
+import paxel.hopscotch.api.enrichment.Value;
 
 import java.time.Instant;
 import java.util.UUID;

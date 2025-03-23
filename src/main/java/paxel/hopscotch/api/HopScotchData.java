@@ -1,8 +1,7 @@
 package paxel.hopscotch.api;
 
 
-import paxel.hopscotch.api.enrichment.KeyBuilder;
-import paxel.hopscotch.api.enrichment.QueryBuilder;
+import paxel.hopscotch.api.enrichment.*;
 
 
 /**
@@ -30,13 +29,33 @@ public interface HopScotchData<D> {
      */
     KeyBuilder startEnrichment();
 
+
     /**
-     * The method to query data from previous enrichments.
-     * The process is self-explorable in the IDE.
-     * You get a {@link QueryBuilder} that will give you either the requested data or more QueryBuilders to refine the data.
+     * Create a {@link KeyQueryBuilder} for the filtered Enrichments
      *
-     * @return the QueryBuilder.
+     * @return a new queryBuilder
      */
-    QueryBuilder startEnrichmentQuery();
+    KeyQueryBuilder queryKey();
+
+    /**
+     * Create a {@link StageQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    StageQueryBuilder queryStage();
+
+    /**
+     * Create a {@link ValueQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    ValueQueryBuilder queryValue();
+
+    /**
+     * Create a {@link CreatorQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    CreatorQueryBuilder queryCreator();
 
 }

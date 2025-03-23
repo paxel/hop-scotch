@@ -1,11 +1,10 @@
 package paxel.hopscotch.impl.data;
 
-import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.Creator;
-import paxel.hopscotch.api.enrichment.KeyBuilder;
-import paxel.hopscotch.api.enrichment.QueryBuilder;
+import paxel.hopscotch.api.HopScotchData;
 import paxel.hopscotch.api.Stage;
-import paxel.hopscotch.impl.enrichment.KeyBuilderImpl;
+import paxel.hopscotch.api.enrichment.*;
+import paxel.hopscotch.impl.enrichment.*;
 
 /**
  * The wrapper for the data and enrichments that is given to Gates, Judges and Hops.
@@ -59,14 +58,32 @@ public class HopScotchEnrichedDataWrapper<D> implements HopScotchData<D> {
         return new KeyBuilderImpl(hopScotchEnrichedData::add, stage, creator);
     }
 
+    @Override
+    public KeyQueryBuilder queryKey() {
+        return new KeyQueryBuilderImpl(hopScotchEnrichedData.getEnrichments());
+    }
+
+    @Override
+    public StageQueryBuilder queryStage() {
+        return new StageQueryBuilderImpl(hopScotchEnrichedData.getEnrichments());
+    }
+
+    @Override
+    public ValueQueryBuilder queryValue() {
+        return new ValueQueryBuilderImpl(hopScotchEnrichedData.getEnrichments());
+    }
+
+    @Override
+    public CreatorQueryBuilder queryCreator() {
+        return new CreatorQueryBuilderImpl(hopScotchEnrichedData.getEnrichments());
+
+    }
+
     private void ensureMutable() {
         if (immutable) {
             throw new UnsupportedOperationException("Enrichment is not allowed here");
         }
     }
 
-    @Override
-    public QueryBuilder startEnrichmentQuery() {
-        return null;
-    }
+
 }
