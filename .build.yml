@@ -1,7 +1,7 @@
 image: ubuntu/lts
 packages:
   - maven
-  - openjdk-21-jre-headless
+  - openjdk-21-jdk-headless
 tasks:
   - dependencies: |
       cd hop-scotch
