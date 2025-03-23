@@ -2,8 +2,6 @@ image: ubuntu/lts
 packages:
   - maven
   - openjdk-21-jre-headless
-sources:
-  - https://git.sr.ht/~taum/dedup
 tasks:
   - dependencies: |
       cd hop-scotch
