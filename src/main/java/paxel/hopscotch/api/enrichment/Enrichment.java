@@ -1,8 +1,7 @@
-package paxel.hopscotch.impl.enrichment;
+package paxel.hopscotch.api.enrichment;
 
 import paxel.hopscotch.api.Creator;
-import paxel.hopscotch.api.enrichment.Key;
-import paxel.hopscotch.api.enrichment.Value;
+import paxel.hopscotch.api.Stage;
 
 import java.time.Instant;
 
@@ -35,4 +34,11 @@ public interface Enrichment {
      * @return The creator.
      */
     Creator creator();
+
+    /**
+     * The stage that created the Enrichment
+     *
+     * @return the Stage
+     */
+    Stage stage();
 }
