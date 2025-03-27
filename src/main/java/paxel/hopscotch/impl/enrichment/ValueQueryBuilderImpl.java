@@ -1,6 +1,12 @@
 package paxel.hopscotch.impl.enrichment;
 
 import paxel.hopscotch.api.enrichment.*;
+import paxel.hopscotch.api.enrichment.values.DoubleValueProvider;
+import paxel.hopscotch.api.enrichment.values.IntValueProvider;
+import paxel.hopscotch.api.enrichment.values.LongValueProvider;
+import paxel.hopscotch.impl.enrichment.values.DoubleValueProviderImpl;
+import paxel.hopscotch.impl.enrichment.values.IntValueProviderImpl;
+import paxel.hopscotch.impl.enrichment.values.LongValueProviderImpl;
 
 import java.util.List;
 import java.util.function.Function;
@@ -35,6 +41,22 @@ public class ValueQueryBuilderImpl implements ValueQueryBuilder {
     public CreatorQueryBuilder queryCreator() {
         return new CreatorQueryBuilderImpl(enrichments);
     }
+
+    @Override
+    public IntValueProvider asInt() {
+        return new IntValueProviderImpl(enrichments.stream().filter(e -> e.value().getType() == Value.Type.INTEGER).toList());
+    }
+
+    @Override
+    public LongValueProvider asLong() {
+        return new LongValueProviderImpl(enrichments.stream().filter(e -> e.value().getType() == Value.Type.LONG).toList());
+    }
+
+    @Override
+    public DoubleValueProvider asDouble() {
+        return new DoubleValueProviderImpl(enrichments.stream().filter(e -> e.value().getType() == Value.Type.DOUBLE).toList());
+    }
+
 
     @Override
     public Stream<Enrichment> stream() {

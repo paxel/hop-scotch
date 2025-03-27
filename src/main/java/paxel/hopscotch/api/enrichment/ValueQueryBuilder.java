@@ -1,5 +1,9 @@
 package paxel.hopscotch.api.enrichment;
 
+import paxel.hopscotch.api.enrichment.values.DoubleValueProvider;
+import paxel.hopscotch.api.enrichment.values.IntValueProvider;
+import paxel.hopscotch.api.enrichment.values.LongValueProvider;
+
 import java.util.stream.Stream;
 
 /**
@@ -29,6 +33,27 @@ public interface ValueQueryBuilder {
      * @return a new queryBuilder
      */
     CreatorQueryBuilder queryCreator();
+
+    /**
+     * Concentrate on Int values
+     *
+     * @return a IntValueProvider
+     */
+    IntValueProvider asInt();
+
+    /**
+     * Concentrate on Long values
+     *
+     * @return a LongValueProvider
+     */
+    LongValueProvider asLong();
+
+    /**
+     * Concentrate on Double values
+     *
+     * @return a DoubleValueProvider
+     */
+    DoubleValueProvider asDouble();
 
     /**
      * Get the enrichments as a Stream.

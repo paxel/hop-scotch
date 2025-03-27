@@ -3,6 +3,7 @@ package paxel.hopscotch.api.enrichment;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * A typesafe definition of user data.
  */
 public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Value.LongValue, Value.FloatValue, Value.DoubleValue, Value.StringValue,
-        Value.BooleanValue, Value.BigIntegerValue, Value.BigDecimalValue, Value.ObjectValue, Value.CollectionValue, Value.MapValue {
+        Value.BooleanValue, Value.BigIntegerValue, Value.BigDecimalValue, Value.ObjectValue, Value.CollectionValue, Value.MapValue, Value.DateValue {
 
     /**
      * The enum describing all supported types
@@ -45,6 +46,10 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
          */
         BOOLEAN,
         /**
+         * A date format
+         */
+        DATE,
+        /**
          * For BigInteger
          */
         BIG_INTEGER,
@@ -72,6 +77,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record FloatValue(float value) implements Value {
+        public Type getType() {
+            return Type.FLOAT;
+        }
     }
 
     /**
@@ -80,6 +88,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record DoubleValue(double value) implements Value {
+        public Type getType() {
+            return Type.DOUBLE;
+        }
     }
 
     /**
@@ -88,6 +99,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record ShortValue(short value) implements Value {
+        public Type getType() {
+            return Type.SHORT;
+        }
     }
 
     /**
@@ -96,6 +110,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record IntegerValue(int value) implements Value {
+        public Type getType() {
+            return Type.INTEGER;
+        }
     }
 
     /**
@@ -104,6 +121,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record LongValue(long value) implements Value {
+        public Type getType() {
+            return Type.LONG;
+        }
     }
 
     /**
@@ -112,6 +132,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record StringValue(String value) implements Value {
+        public Type getType() {
+            return Type.STRING;
+        }
     }
 
     /**
@@ -120,6 +143,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record BooleanValue(boolean value) implements Value {
+        public Type getType() {
+            return Type.BOOLEAN;
+        }
     }
 
     /**
@@ -128,6 +154,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record BigDecimalValue(BigDecimal value) implements Value {
+        public Type getType() {
+            return Type.BIG_DECIMAL;
+        }
     }
 
     /**
@@ -136,9 +165,22 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param value The user generated value
      */
     record BigIntegerValue(BigInteger value) implements Value {
+        public Type getType() {
+            return Type.INTEGER;
+        }
     }
 
-    // TODO: Date!
+    /**
+     * Constructs a typesafe instance
+     *
+     * @param value The user generated value
+     */
+    record DateValue(ZonedDateTime value) implements Value {
+        public Type getType() {
+            return Type.DATE;
+        }
+    }
+
 
     /**
      * Constructs a typesafe instance
@@ -147,6 +189,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param <V>   The type of the value
      */
     record ObjectValue<V>(V value) implements Value {
+        public Type getType() {
+            return Type.OBJECT;
+        }
     }
 
     /**
@@ -156,6 +201,9 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param <V>   The type of the value
      */
     record CollectionValue<V>(Collection<V> value) implements Value {
+        public Type getType() {
+            return Type.COLLECTION;
+        }
     }
 
     /**
@@ -166,5 +214,16 @@ public sealed interface Value permits Value.ShortValue, Value.IntegerValue, Valu
      * @param <K>   The key of the value
      */
     record MapValue<K, V>(Map<K, V> value) implements Value {
+        public Type getType() {
+            return Type.MAP;
+        }
     }
+
+
+    /**
+     * Retrieve the type of the value.
+     *
+     * @return The Type of the value
+     */
+    Type getType();
 }
