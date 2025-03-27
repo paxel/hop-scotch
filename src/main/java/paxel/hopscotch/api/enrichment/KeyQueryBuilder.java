@@ -1,7 +1,5 @@
 package paxel.hopscotch.api.enrichment;
 
-import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
-
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -9,7 +7,6 @@ import java.util.stream.Stream;
  * The Query-builder for querying or filtering for keys.
  */
 public interface KeyQueryBuilder {
-
 
     /**
      * Create a new KeyQueryBuilder that has only the entities with the given key
@@ -83,7 +80,6 @@ public interface KeyQueryBuilder {
      */
     KeyQueryBuilder containsInOrder(String... subPaths);
 
-
     /**
      * Create a new KeyQueryBuilder that has as Source the result of the given regex match on keys.
      * <br>
@@ -97,16 +93,9 @@ public interface KeyQueryBuilder {
      */
     KeyQueryBuilder matchRegex(String regex);
 
-
-    /**
-     * Get the enrichments as a Stream.
-     *
-     * @return a stream of enrichments
-     */
-    Stream<EnrichmentImpl> stream();
-
     /**
      * Create a {@link StageQueryBuilder} for the filtered Enrichments
+     *
      * @return a new queryBuilder
      */
     StageQueryBuilder queryStage();
@@ -124,5 +113,12 @@ public interface KeyQueryBuilder {
      * @return a new queryBuilder
      */
     CreatorQueryBuilder queryCreator();
+
+    /**
+     * Get the enrichments as a Stream.
+     *
+     * @return a stream of enrichments
+     */
+    Stream<Enrichment> stream();
 
 }

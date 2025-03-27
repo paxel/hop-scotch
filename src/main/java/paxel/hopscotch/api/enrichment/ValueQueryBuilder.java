@@ -1,7 +1,6 @@
 package paxel.hopscotch.api.enrichment;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * The Query-builder for querying or filtering for values.
@@ -9,25 +8,32 @@ import java.util.Optional;
 
 public interface ValueQueryBuilder {
 
-    /**
-     * Create a new ValueQueryBuilder that has only the entities with the given type
-     *
-     * @param type The Value type
-     * @return the ValueQueryBuilder for the filtered enrichments
-     */
-    ValueQueryBuilder matchType(Value.Type type);
 
     /**
-     * Get any value if available.
+     * Create a {@link KeyQueryBuilder} for the filtered Enrichments
      *
-     * @return optional value
+     * @return a new queryBuilder
      */
-    Optional<Integer> anyInteger();
+    KeyQueryBuilder queryKey();
 
     /**
-     * Get all values
+     * Create a {@link StageQueryBuilder} for the filtered Enrichments
      *
-     * @return all matching values
+     * @return a new queryBuilder
      */
-    Collection<Integer> allInteger();
+    StageQueryBuilder queryStage();
+
+    /**
+     * Create a {@link CreatorQueryBuilder} for the filtered Enrichments
+     *
+     * @return a new queryBuilder
+     */
+    CreatorQueryBuilder queryCreator();
+
+    /**
+     * Get the enrichments as a Stream.
+     *
+     * @return a stream of enrichments
+     */
+    Stream<Enrichment> stream();
 }

@@ -4,23 +4,23 @@ import paxel.hopscotch.api.enrichment.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- *
+ * Implements the {@link KeyQueryBuilder} which reduces the available enrichments depending on the Creator.
  */
 public class KeyQueryBuilderImpl implements KeyQueryBuilder {
-
 
     private final List<EnrichmentImpl> enrichments;
 
     /**
-     * Constructs a {@link KeyQueryBuilder} for given {@link EnrichmentImpl}s
+     * Constructs an instance with the remaining {@link Enrichment}s
      *
-     * @param enrichments the remaining enrichments
+     * @param enrichments The remaining enrichments.
      */
     public KeyQueryBuilderImpl(List<EnrichmentImpl> enrichments) {
         this.enrichments = List.copyOf(enrichments);
@@ -81,8 +81,8 @@ public class KeyQueryBuilderImpl implements KeyQueryBuilder {
     }
 
     @Override
-    public Stream<EnrichmentImpl> stream() {
-        return enrichments.stream();
+    public Stream<Enrichment> stream() {
+        return enrichments.stream().map(Function.identity());
     }
 
     private Stream<EnrichmentImpl> filterRegex(Pattern pattern) {
@@ -91,7 +91,7 @@ public class KeyQueryBuilderImpl implements KeyQueryBuilder {
 
 
     private Stream<EnrichmentImpl> filter(Predicate<EnrichmentImpl> predicate) {
-        return stream().filter(predicate);
+        return enrichments.stream().filter(predicate);
     }
 
 

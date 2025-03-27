@@ -1,34 +1,44 @@
 package paxel.hopscotch.impl.enrichment;
 
-import paxel.hopscotch.api.enrichment.Value;
-import paxel.hopscotch.api.enrichment.ValueQueryBuilder;
+import paxel.hopscotch.api.enrichment.*;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
- *
+ * Implements the {@link ValueQueryBuilder} which reduces the available enrichments depending on the Creator.
  */
 public class ValueQueryBuilderImpl implements ValueQueryBuilder {
+    private final List<EnrichmentImpl> enrichments;
+
     /**
-     * @param enrichments
+     * Constructs an instance with the remaining {@link Enrichment}s
+     *
+     * @param enrichments The remaining enrichments.
      */
     public ValueQueryBuilderImpl(List<EnrichmentImpl> enrichments) {
+        this.enrichments = enrichments;
     }
 
     @Override
-    public ValueQueryBuilder matchType(Value.Type type) {
-        return null;
+    public KeyQueryBuilder queryKey() {
+        return new KeyQueryBuilderImpl(enrichments);
     }
 
     @Override
-    public Optional<Integer> anyInteger() {
-        return Optional.empty();
+    public StageQueryBuilder queryStage() {
+        return new StageQueryBuilderImpl(enrichments);
     }
 
     @Override
-    public Collection<Integer> allInteger() {
-        return List.of();
+    public CreatorQueryBuilder queryCreator() {
+        return new CreatorQueryBuilderImpl(enrichments);
     }
+
+    @Override
+    public Stream<Enrichment> stream() {
+        return enrichments.stream().map(Function.identity());
+    }
+
 }
