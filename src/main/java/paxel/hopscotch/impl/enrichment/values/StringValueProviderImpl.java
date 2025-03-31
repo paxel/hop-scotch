@@ -1,16 +1,16 @@
 package paxel.hopscotch.impl.enrichment.values;
 
 import paxel.hopscotch.api.enrichment.Value;
-import paxel.hopscotch.api.enrichment.values.IntValueProvider;
+import paxel.hopscotch.api.enrichment.values.StringValueProvider;
 import paxel.hopscotch.impl.enrichment.EnrichmentImpl;
 
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Provides Integer values as objects or primitives
  */
-public class StringValueProviderImpl implements IntValueProvider {
+public class StringValueProviderImpl implements StringValueProvider {
     private final List<EnrichmentImpl> enrichments;
 
     /**
@@ -24,11 +24,15 @@ public class StringValueProviderImpl implements IntValueProvider {
 
 
     @Override
-    public IntStream stream() {
+    public Stream<String> stream() {
         return enrichments.stream()
                 .map(EnrichmentImpl::value)
-                .filter(v -> v.getType() == Value.Type.INTEGER)
-                .mapToInt(value -> ((Value.IntegerValue) value).value());
+                .filter(v -> v.getType() == Value.Type.STRING)
+                .map(value -> ((Value.StringValue) value).value());
     }
 
+    @Override
+    public Value.Type getType() {
+        return Value.Type.STRING;
+    }
 }

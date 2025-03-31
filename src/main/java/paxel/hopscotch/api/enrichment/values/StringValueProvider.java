@@ -1,11 +1,11 @@
 package paxel.hopscotch.api.enrichment.values;
 
-import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 /**
  * Provides long values
  */
-public interface DoubleValueProvider extends ValueProvider {
+public interface StringValueProvider extends ValueProvider {
 
 
     /**
@@ -13,5 +13,5 @@ public interface DoubleValueProvider extends ValueProvider {
      *
      * @return Raw Stream
      */
-    DoubleStream stream();
+    Stream<String> stream();
 }

@@ -31,4 +31,8 @@ public class DoubleValueProviderImpl implements DoubleValueProvider {
                 .mapToDouble(value -> ((Value.DoubleValue) value).value());
     }
 
+    @Override
+    public Value.Type getType() {
+        return Value.Type.DOUBLE;
+    }
 }

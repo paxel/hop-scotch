@@ -31,4 +31,8 @@ public class IntValueProviderImpl implements IntValueProvider {
                 .mapToInt(value -> ((Value.IntegerValue) value).value());
     }
 
+    @Override
+    public Value.Type getType() {
+        return Value.Type.INTEGER;
+    }
 }

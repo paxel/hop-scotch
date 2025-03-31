@@ -31,4 +31,8 @@ public class LongValueProviderImpl implements LongValueProvider {
                 .mapToLong(value -> ((Value.LongValue) value).value());
     }
 
+    @Override
+    public Value.Type getType() {
+        return Value.Type.LONG;
+    }
 }
