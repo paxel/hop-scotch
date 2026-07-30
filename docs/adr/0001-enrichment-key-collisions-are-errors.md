@@ -1,8 +1,15 @@
 ---
-status: proposed
+status: carried forward — not implemented here
 ---
 
 # Enrichment Key collisions are errors, detected by uuid identity
+
+> **This repository is an archived prototype.** The decision below was accepted and
+> carried into the Rust successor at `../hopscotch-rs` (see its
+> `docs/adr/0001-enrichment-key-collisions-are-errors.md`). It is deliberately **not**
+> implemented in Java: all three prerequisite fixes are in `DataAggregator` and the actor
+> message protocol, which the successor's execution model deletes entirely. The reasoning
+> below remains accurate about this codebase and is why the successor decided as it did.
 
 A Key identifies at most one Enrichment per Data. Two producers writing the same Key to one Data is a programming error, not a merge conflict to be resolved by a rule. Identity for de-duplication will be `EnrichmentImpl.uuid`, never the Key and never record equality. Collisions will be enforced at two points with different policies, because only one of them has user code on the stack to fail into.
 

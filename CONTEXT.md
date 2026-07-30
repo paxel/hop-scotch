@@ -1,5 +1,10 @@
 # Hop-Scotch
 
+> **Archived prototype.** This glossary describes the Java implementation in this
+> repository, which is no longer developed. The successor's vocabulary — which drops
+> `Fragment`, renames `Data` to `Datum`, and adds `Source`, `Origin`, `Partition`,
+> `Dead letter` and `Event` — lives in `../hopscotch-rs/CONTEXT.md`.
+
 A framework for self-managing data pipelines. The user declares numbered processing steps and the conditions under which each applies; the framework builds and runs the actor chain that carries data through them.
 
 ## Language
